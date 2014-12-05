@@ -1,0 +1,9 @@
+{
+  "result": [
+    {
+      "senderId": "id1", // index!
+      "receiverId": "id2",  // index!
+      "state": 0  // 0 - not accepted, 1 - accepted
+    }
+  ]
+}
