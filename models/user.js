@@ -4,7 +4,7 @@ var bcrypt = require('bcrypt');
 // TODO: add validation
 var userSchema = mongoose.Schema({
   name: { type: String, required: true },
-  surname: { type: String, required: true },
+  lastname: { type: String, required: true },
   regDate: { type: Date, required: true },
   login: { type: String, required: true, unique: true },
   pass: { type: String, required: true }

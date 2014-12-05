@@ -8,7 +8,7 @@ function init() {
     done(null, user._id);
   });
 
-  passport.deserializeUser(function(user, done) {
+  passport.deserializeUser(function(id, done) {
     User.findById(id, function(err, user) {
       done(err, user);
     });
@@ -20,10 +20,10 @@ function init() {
     }, function(login, pass, done) {
       User.findOne({ login: login }, function(err, user) {
         if (err)
-          done(err);
+          return done(err);
 
         if (!user)
-          done(null, false, { userFound: false });
+          return done(null, false, { userFound: false });
 
         user.comparePass(pass, function(err, isMatch) {
           if (err)
