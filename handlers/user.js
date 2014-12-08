@@ -6,7 +6,9 @@ function getById(req, res, next, userId) {
   var user = User.findById(
     userId,
     'name lastname regDate',
-    function(err, user) { res.json(user); }
+    function(err, user) {
+      return err ? next(err) : res.json(user);
+    }
   );
 }
 

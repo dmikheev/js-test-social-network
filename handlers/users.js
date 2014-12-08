@@ -1,6 +1,6 @@
-var PAGE_RESULTS_COUNT = 10;
-
 var User = require('./../models/user');
+
+var PAGE_RESULTS_COUNT = 10;
 
 function find(req, res, next) {
   var searchString = req.params.search_query || '';
@@ -12,8 +12,8 @@ function find(req, res, next) {
       .find(
         { $text: { $search: searchString } },
         {
-          name: 'name',
-          lastname: 'lastname',
+          name: true,
+          lastname: true,
           score: { $meta: 'textScore' }
         }
       )
@@ -26,10 +26,7 @@ function find(req, res, next) {
     .skip(pageNum * PAGE_RESULTS_COUNT)
     .limit(PAGE_RESULTS_COUNT)
     .exec(function(err, users) {
-      if (err)
-        next(err);
-
-      res.json(users);
+      return err ? next(err) : res.json(users);
     });
 }
 

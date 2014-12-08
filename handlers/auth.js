@@ -2,6 +2,9 @@ var passport = require('passport');
 
 var User = require('./../models/user');
 
+var RESULT_TYPE_REGISTER = 'REGISTER';
+var RESULT_TYPE_LOGIN = 'LOGIN';
+
 function auth(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
     if (err)
@@ -30,15 +33,15 @@ function registerUser(req, res, next) {
   });
 
   user.save(function(err) {
-    return err ? next(err) : loginUser(req, res, user, next, 'register');
+    return err ? next(err) : loginUser(req, res, user, next, RESULT_TYPE_REGISTER);
   });
 }
 
-function loginUser(req, res, user, next, result) {
+function loginUser(req, res, user, next, resultType) {
   req.logIn(user, function(err) {
-    var result = result ? result : 'login';
+    resultType = resultType || RESULT_TYPE_LOGIN;
 
-    return err ? next(err) : res.json(result);
+    return err ? next(err) : res.json({ operation: resultType });
   });
 }
 
