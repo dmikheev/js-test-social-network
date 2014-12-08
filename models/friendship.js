@@ -6,7 +6,8 @@ var friendshipSchema = mongoose.Schema({
   receiverId: { type: ObjectId, required: true },
   accepted: { type: Boolean, required: true }
 });
-friendshipSchema.index({ senderId: 1 });
-friendshipSchema.index({ receiverId: 1 });
+
+friendshipSchema.index({ senderId: 1, accepted: 1 });
+friendshipSchema.index({ receiverId: 1, accepted: 1 });
 
 module.exports = mongoose.model('Friendship', friendshipSchema);

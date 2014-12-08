@@ -10,6 +10,8 @@ var userSchema = mongoose.Schema({
   pass: { type: String, required: true }
 });
 
+userSchema.index({ name: 'text', lastname: 'text' });
+
 // сохраняем не пароль, а его хеш
 userSchema.pre('save', function(next) {
   var user = this;

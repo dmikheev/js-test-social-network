@@ -30,13 +30,15 @@ function registerUser(req, res, next) {
   });
 
   user.save(function(err) {
-    return err ? next(err) : loginUser(req, res, user, next);
+    return err ? next(err) : loginUser(req, res, user, next, 'register');
   });
 }
 
-function loginUser(req, res, user, next) {
+function loginUser(req, res, user, next, result) {
   req.logIn(user, function(err) {
-    return err ? next(err) : res.send('OK');
+    var result = result ? result : 'login';
+
+    return err ? next(err) : res.json(result);
   });
 }
 

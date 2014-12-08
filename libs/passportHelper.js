@@ -47,7 +47,7 @@ function ensureAuthenticated(req, res, next) {
     return next();
   }
 
-  res.redirect('/login');
+  res.status(401).send({ error: 'AUTH_REQUIRED' });
 }
 
 module.exports = {
