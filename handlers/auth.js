@@ -2,8 +2,10 @@ var passport = require('passport');
 
 var User = require('./../models/user');
 
-var RESULT_TYPE_REGISTER = 'REGISTER';
-var RESULT_TYPE_LOGIN = 'LOGIN';
+var RESULT_TYPE = {
+  REGISTER: 'REGISTER',
+  LOGIN: 'LOGIN'
+};
 
 function auth(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
@@ -12,8 +14,7 @@ function auth(req, res, next) {
 
     if (!user) {
       if (info.userFound) {
-        req.session.messages = [ info.message ];
-        return res.send();
+        return res.status(401).json({ error: { message: info.message } });
       } else {
         return registerUser(req, res, next);
       }
@@ -33,15 +34,42 @@ function registerUser(req, res, next) {
   });
 
   user.save(function(err) {
-    return err ? next(err) : loginUser(req, res, user, next, RESULT_TYPE_REGISTER);
+    return err ? next(err) : loginUser(req, res, user, next, true);
   });
 }
 
-function loginUser(req, res, user, next, resultType) {
+function loginUser(req, res, user, next, isJustRegistered) {
   req.logIn(user, function(err) {
-    resultType = resultType || RESULT_TYPE_LOGIN;
+    if (err)
+      return next(err);
 
-    return err ? next(err) : res.json({ operation: resultType });
+    if (isJustRegistered) {
+      return res.json({ operation: RESULT_TYPE.REGISTER });
+    }
+
+    var newName, newLastname;
+    if (req.body.name !== user.name) {
+      newName = req.body.name;
+    }
+    if (req.body.lastname !== user.lastname) {
+      newLastname = req.body.lastname;
+    }
+
+    if (!newName && !newLastname) {
+      return res.json({ operation: RESULT_TYPE.LOGIN });
+    }
+
+    if (newName) {
+      user.name = newName;
+    }
+
+    if (newLastname) {
+      user.lastname = newLastname;
+    }
+
+    user.save(function(err) {
+      return err ? next(err) : res.json({ operation: RESULT_TYPE.LOGIN });
+    });
   });
 }
 

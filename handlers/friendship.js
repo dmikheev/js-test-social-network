@@ -5,13 +5,20 @@ function request(req, res, next) {
   var senderId = req.user._id;
   var receiverId = req.params.user_id;
 
+  if (senderId == receiverId) {
+    return res.status(422).json({
+      error: { message: 'You cannot request friendship with yourself!' }
+    });
+  }
+
   User.findById(receiverId, function(err, user) {
     if (err)
-      next(err);
+      return next(err);
 
     if (!user) {
-      res.status(422).json({ error: 'Receiving user not found' });
-      return;
+      return res.status(422).json({
+        error: { message: 'Receiving user not found' }
+      });
     }
 
     Friendship.findOne(
@@ -21,7 +28,9 @@ function request(req, res, next) {
           return next(err);
 
         if (friendship) {
-          res.status(422).json({ error: 'Friendship already exists' });
+          res.status(422).json({
+            error: { message: 'Friendship already exists' }
+          });
           return;
         }
 
@@ -51,8 +60,14 @@ function accept(req, res, next) {
       return next(err);
 
     if (!friendship) {
-      res.status(422).json({ error: 'Friendship not found' });
-      return;
+      return res.status(422).json({
+        error: { message: 'Friendship not found' }
+      });
+    }
+    if (friendship.senderId == req.user.id) {
+      return res.status(422).json({
+        error: { message: 'You cannot accept your request' }
+      });
     }
 
     friendship.accepted = true;
@@ -61,7 +76,7 @@ function accept(req, res, next) {
           _id: friendship._id,
           senderId: friendship.senderId,
           receiverId: friendship.receiverId,
-          accepted: newFriendship.accepted
+          accepted: friendship.accepted
         });
     });
   });
@@ -75,12 +90,13 @@ function decline(req, res, next) {
       return next(err);
 
     if (!friendship) {
-      res.status(422).json({ error: 'Friendship not found' });
-      return;
+      return res.status(422).json({
+        error: { message: 'Friendship not found' } 
+      });
     }
 
     friendship.remove(function(err) {
-      return err ? next(err) : res.send();
+      return err ? next(err) : res.status(204).send();
     });
   });
 }

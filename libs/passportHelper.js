@@ -47,7 +47,7 @@ function ensureAuthenticated(req, res, next) {
     return next();
   }
 
-  res.status(401).send({ error: 'AUTH_REQUIRED' });
+  res.status(401).json({ error: { message: 'AUTH_REQUIRED' } });
 }
 
 module.exports = {

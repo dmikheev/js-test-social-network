@@ -13,6 +13,7 @@ friendshipSchema.index({ senderId: 1 });
 friendshipSchema.index({ receiverId: 1 });
 
 friendshipSchema.statics.getItemsForUser = function(userId, populate, callback) {
+  var self = this;
   var senderQuery = this.find({ senderId: userId });
 
   if (populate) {
@@ -25,7 +26,7 @@ friendshipSchema.statics.getItemsForUser = function(userId, populate, callback) 
       return;
     }
 
-    var receiverQuery = this.find({ receiverId: userId });
+    var receiverQuery = self.find({ receiverId: userId });
 
     if (populate) {
       receiverQuery.populate('senderId', 'name lastname');
