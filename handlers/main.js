@@ -1,3 +1,6 @@
+/**
+ * Модуль, собирающий все обработчики
+ */
 var auth = require('./auth');
 var user = require('./user');
 var users = require('./users');

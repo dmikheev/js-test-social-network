@@ -1,11 +1,22 @@
+/**
+ * Модель пользователя для mongoose
+ */
+
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 
+/** Тексты ошибок валидации полей */
 var nameValidationErrorText = '"{PATH}" must be 2-32 long alphabetic string';
 var loginValidationErrorText = 'Login must be 4-8 long alphanumeric string and start with letter';
 var passValidationErrorText = 'Password must be 6-12 long alphanumeric string and contain at least one number and letter';
 
-// TODO: add validation
+/**
+ * name - имя пользователя
+ * lastname - фамилия пользователя
+ * regDate - дата регистрации
+ * login - логин
+ * pass - пароль
+ */
 var userSchema = mongoose.Schema({
   name: { type: String, required: true, validate: [ nameValidator, nameValidationErrorText ] },
   lastname: { type: String, required: true, validate: [ nameValidator, nameValidationErrorText ] },
@@ -16,7 +27,7 @@ var userSchema = mongoose.Schema({
 
 userSchema.index({ name: 'text', lastname: 'text' });
 
-// сохраняем не пароль, а его хеш
+/** Cохраняем не пароль, а его хеш, используя bcrypt */
 userSchema.pre('save', function(next) {
   var user = this;
 
@@ -37,6 +48,7 @@ userSchema.pre('save', function(next) {
   });
 });
 
+/** Проверяем пароль, используя bcrypt */
 userSchema.methods.comparePass = function(enteredPass, cb) {
   bcrypt.compare(enteredPass, this.pass, function(err, isMatch) {
     if (err)
@@ -48,6 +60,7 @@ userSchema.methods.comparePass = function(enteredPass, cb) {
 
 module.exports = mongoose.model('User', userSchema);
 
+/** Функции валидации полей */
 function nameValidator(value) {
   return /^[A-Za-z]{2,32}$/.test(value);
 }

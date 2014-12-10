@@ -1,12 +1,21 @@
+/**
+ * Обработка запроса на логин или регистрацию
+ */
 var passport = require('passport');
 
 var User = require('./../models/user');
 
+/**
+ * Константы, обозначающие тип операции
+ */
 var RESULT_TYPE = {
   REGISTER: 'REGISTER',
   LOGIN: 'LOGIN'
 };
 
+/**
+ * Проверяем результаты аутентификации
+ */
 function auth(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
     if (err)
@@ -24,6 +33,9 @@ function auth(req, res, next) {
   })(req, res, next);
 }
 
+/**
+ * Регистрируем пользователя
+ */
 function registerUser(req, res, next) {
   var user = new User({
     name: req.body.name,
@@ -38,6 +50,11 @@ function registerUser(req, res, next) {
   });
 }
 
+/**
+ * Логиним пользователя и меняем его имя/фамилию, если они указаны
+ * и пользователь не только что зарегистрирован.
+ * В ответе отправляем тип проведённой операции.
+ */
 function loginUser(req, res, user, next, isJustRegistered) {
   req.logIn(user, function(err) {
     if (err)

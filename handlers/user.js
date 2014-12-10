@@ -1,7 +1,14 @@
+/**
+ * Обработчик запроса на получение профиля пользователя.
+ */
 var User = require('./../models/user');
 
-function getById(req, res, next, userId) {
-  userId = userId || req.params.user_id;
+/**
+ * В параметрах запроса берём id пользователя
+ * или возвращаем профиль текущего авторизованного пользователя.
+ */
+function getById(req, res, next) {
+  var userId = req.params.user_id || req.user._id;
 
   var user = User.findById(
     userId,
@@ -12,11 +19,6 @@ function getById(req, res, next, userId) {
   );
 }
 
-function getCurrentUser(req, res, next) {
-  return getById(req, res, next, req.user._id);
-}
-
 module.exports = {
-  getById: getById,
-  getCurrentUser: getCurrentUser
+  getById: getById
 };

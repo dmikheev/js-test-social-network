@@ -1,3 +1,6 @@
+/**
+ * Обработчик запроса на получение списка заявок и друзей
+ */
 var Friendship = require('./../models/friendship');
 
 function getAll(req, res, next) {

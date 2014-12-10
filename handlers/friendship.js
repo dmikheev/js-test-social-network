@@ -1,6 +1,14 @@
+/**
+ * Обработчики запросов на добавление в друзья,
+ * подтверждение и удаление дружбы
+ */
 var User = require('./../models/user');
 var Friendship = require('./../models/friendship');
 
+/**
+ * Заявка на добавление в друзья.
+ * В параметрах запроса берём id пользователя, к которому добавляемся.
+ */
 function request(req, res, next) {
   var senderId = req.user._id;
   var receiverId = req.params.user_id;
@@ -52,6 +60,10 @@ function request(req, res, next) {
   });
 }
 
+/**
+ * Подтверждение дружбы.
+ * В параметрах запроса берём id дружбы, которую подтверждаем.
+ */
 function accept(req, res, next) {
   var friendshipId = req.params.friendship_id;
 
@@ -64,9 +76,9 @@ function accept(req, res, next) {
         error: { message: 'Friendship not found' }
       });
     }
-    if (friendship.senderId == req.user.id) {
-      return res.status(422).json({
-        error: { message: 'You cannot accept your request' }
+    if (friendship.receiverId != req.user.id) {
+      return res.status(403).json({
+        error: { message: 'You must be receiver to accept request' }
       });
     }
 
@@ -82,6 +94,10 @@ function accept(req, res, next) {
   });
 }
 
+/**
+ * Отклонение заявки на дружбу.
+ * В параметрах запроса берём id дружбы, которую отклоняем.
+ */
 function decline(req, res, next) {
   var friendshipId = req.params.friendship_id;
 
@@ -93,6 +109,12 @@ function decline(req, res, next) {
       return res.status(422).json({
         error: { message: 'Friendship not found' } 
       });
+    }
+    if (friendship.senderId != req.user.id &&
+      friendship.receiverId != req.user.id) {
+        return res.status(403).json({
+          error: { message: 'You must be sender or receiver to decline request' }
+        });
     }
 
     friendship.remove(function(err) {
