@@ -5,7 +5,7 @@
 var express = require('express');
 var mongoose = require('mongoose');
 var passport = require('passport');
-var session = require('cookie-session');
+var session = require('express-session');
 var bodyParser = require('body-parser');
 
 var config = require('./libs/config');
@@ -27,14 +27,18 @@ var app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(session({ secret: 'secret_key' }));
+app.use(session({
+  resave: false,
+  saveUninitialized: true,
+  secret: config.get('session_secret_key')
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 
 var handlers = require('./handlers/main');
 
 routes.setup(app, handlers, passportHelper.ensureAuthenticated);
-app.use(express.static('public'));
+app.use(express.static('client/dist'));
 
 app.use(errorHandler);
 

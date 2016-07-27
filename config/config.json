@@ -1,5 +1,6 @@
 {
-  "port": 8080,
+  "session_secret_key": "J7LVDoCX3PtEjFOtc3Pw",
+  "port": 80,
   "db": {
     "host": "localhost",
     "name": "js-test-rosdengi"
