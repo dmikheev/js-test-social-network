@@ -1,15 +1,12 @@
 import React from 'react';
 
+import Navigation from '../Navigation';
+
 export default class FriendsPage extends React.Component {
   render() {
     return (
       <div className="ui">
-        <div className="navigation">
-          <ul>
-            <li className="active"><a href="/" className="button rectangular"><i className="fa fa-user"></i><span>Friends</span></a></li>
-            <li><a href="/" className="button rectangular"><i className="fa fa-search"></i><span>Search</span></a></li>
-          </ul>
-        </div>
+        <Navigation/>
         <div className="page-wrapper">
           <div className="page">
             <div className="grid-container">
