@@ -65,10 +65,10 @@ function loginUser(req, res, user, next, isJustRegistered) {
     }
 
     var newName, newLastname;
-    if (req.body.name !== user.name) {
+    if (req.body.name && req.body.name !== user.name) {
       newName = req.body.name;
     }
-    if (req.body.lastname !== user.lastname) {
+    if (req.body.lastname && req.body.lastname !== user.lastname) {
       newLastname = req.body.lastname;
     }
 

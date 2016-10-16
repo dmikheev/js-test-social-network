@@ -1,30 +1,45 @@
 import React from 'react';
 
-export default class Navigation extends React.Component {
-  render() {
-    return (
-      <div className="navigation">
-        <ul>
-          <li className="active">
-            <a href="/#/profile" className="button rectangular">
-              <i className="fa fa-user"></i>
-              <span>Profile</span>
-            </a>
-          </li>
-          <li>
-            <a href="/#/friends" className="button rectangular">
-              <i className="fa fa-users"></i>
-              <span>Friends</span>
-            </a>
-          </li>
-          <li>
-            <a href="/#/search" className="button rectangular">
-              <i className="fa fa-search"></i>
-              <span>Search</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-    );
-  }
+function getNavPath() {
+  const hash = location.hash;
+  const queryStartIdx = hash.indexOf('?');
+  return `/${queryStartIdx === -1 ? hash : hash.substring(0, queryStartIdx)}`;
+}
+
+export default function Navigation() {
+  const navItems = [
+    {
+      href: '/#/profile',
+      iconClass: 'fa-user',
+      caption: 'Profile',
+    },
+    {
+      href: '/#/friends',
+      iconClass: 'fa-users',
+      caption: 'Friends',
+    },
+    {
+      href: '/#/search',
+      iconClass: 'fa-search',
+      caption: 'Search',
+    },
+  ];
+  const curPath = getNavPath();
+
+  return (
+    <div className="navigation">
+      <ul>
+        {
+          navItems.map((item, idx) => (
+            <li className={`${curPath === item.href ? 'active' : ''}`} key={idx}>
+              <a href={item.href} className="button rectangular">
+                <i className={`fa ${item.iconClass}`}></i>
+                {item.caption}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  );
 }
