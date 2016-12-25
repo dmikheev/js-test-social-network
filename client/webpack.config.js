@@ -23,7 +23,14 @@ module.exports = {
   },
   devServer: {
     contentBase: './dist',
-    hot: true
+    hot: true,
+    proxy: {
+      '/api/**': {
+        target: 'http://localhost',
+        secure: false,
+        logLevel: 'debug'
+      }
+    }
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),

@@ -17,12 +17,12 @@ ReactDOM.render(
   <Provider store={store}>
     <Router history={hashHistory}>
       <Route path="" component={App}>
-        <Route path="/login" component={LoginPage} />
-        <Route path="/profile" component={ProfilePage} />
-        <Route path="/friends" component={FriendsPage} />
-        <Route path="/search" component={SearchPage} />
-        <Redirect from="/" to="/profile" />
-        <Redirect from="/*" to="/profile" />
+        <Route path={LoginPage.getPath()} component={LoginPage} />
+        <Route path={ProfilePage.getPath()} component={ProfilePage} />
+        <Route path={FriendsPage.getPath()} component={FriendsPage} />
+        <Route path={SearchPage.getPath()} component={SearchPage} />
+        <Redirect from="/" to={ProfilePage.getPath()} />
+        <Redirect from="/*" to={ProfilePage.getPath()} />
       </Route>
     </Router>
   </Provider>,

@@ -3,6 +3,10 @@ import React from 'react';
 import Navigation from '../Navigation';
 
 export default class ProfilePage extends React.Component {
+  static getPath() {
+    return '/profile';
+  };
+
   render() {
     return (
       <div className="ui">

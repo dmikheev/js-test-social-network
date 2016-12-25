@@ -10,6 +10,8 @@ export default function(state, action) {
 
 function getDefaultState() {
   return fromJS({
-    isUserAuthorized: false
+    authorization: {
+      isChecked: false,
+    }
   });
 }

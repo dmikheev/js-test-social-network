@@ -3,6 +3,10 @@ import React from 'react';
 import Navigation from '../Navigation';
 
 export default class SearchPage extends React.Component {
+  static getPath() {
+    return '/search';
+  };
+
   render() {
     return (
       <div className="ui">
