@@ -1,12 +1,8 @@
 import React from 'react';
-
 import Navigation from '../Navigation';
+import CheckAuthorizePage from "../common/CheckAuthorizePage";
 
-export default class ProfilePage extends React.Component {
-  static getPath() {
-    return '/profile';
-  };
-
+class ProfilePage extends React.Component {
   render() {
     return (
       <div className="ui">
@@ -27,3 +23,5 @@ export default class ProfilePage extends React.Component {
     );
   }
 }
+
+export default CheckAuthorizePage(true)(ProfilePage);

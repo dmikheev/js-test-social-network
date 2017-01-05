@@ -3,10 +3,6 @@ import React from 'react';
 import Navigation from '../Navigation';
 
 export default class FriendsPage extends React.Component {
-  static getPath() {
-    return '/friends';
-  };
-
   render() {
     return (
       <div className="ui">

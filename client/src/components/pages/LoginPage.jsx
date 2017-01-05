@@ -1,10 +1,7 @@
 import React from 'react';
+import CheckAuthorizePage from "../common/CheckAuthorizePage";
 
-export default class LoginPage extends React.Component {
-  static getPath() {
-    return '/login';
-  };
-
+class LoginPage extends React.Component {
   render() {
     return (
       <div className="ui">
@@ -31,3 +28,5 @@ export default class LoginPage extends React.Component {
     );
   }
 }
+
+export default CheckAuthorizePage(false)(LoginPage);

@@ -1,15 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
+import { PATHS } from '../../constants';
 
-import LoginPage from '../pages/LoginPage';
-import ProfilePage from '../pages/ProfilePage';
-
-const REDIRECT_UNAUTH_PATH = LoginPage.getPath();
-const REDIRECT_AUTH_PATH = ProfilePage.getPath();
+const REDIRECT_UNAUTH_PATH = PATHS.LOGIN;
+const REDIRECT_AUTH_PATH = PATHS.PROFILE;
 
 export default (isPageForAuthUsers) => (WrappedComponent) => {
-  class CheckAuthorizePage extends React.Component {
+  class CheckAuthorizePageComponent extends React.Component {
     componentDidMount() {
       this.checkAuth();
     }
@@ -43,10 +41,10 @@ export default (isPageForAuthUsers) => (WrappedComponent) => {
 
   function mapStateToProps(state) {
     return {
-      isAuthChecked: state.authorization.isChecked,
-      isUserAuthorized: state.authorization.isUserAuthorized,
+      isAuthChecked: state.getIn(['authorization', 'isChecked']),
+      isUserAuthorized: state.getIn(['authorization', 'isUserAuthorized']),
     };
   }
 
-  return connect(mapStateToProps)(withRouter(CheckAuthorizePage));
-}
+  return connect(mapStateToProps)(withRouter(CheckAuthorizePageComponent));
+};
