@@ -1,45 +1,52 @@
 import React from 'react';
+import {withRouter, Link} from "react-router";
+import profilePath from "./pages/ProfilePage/profilePath";
+import friendsPath from "./pages/FriendsPage/friendsPath";
+import searchPath from "./pages/SearchPage/searchPath";
 
-function getNavPath() {
-  const hash = location.hash;
-  const queryStartIdx = hash.indexOf('?');
-  return `/${queryStartIdx === -1 ? hash : hash.substring(0, queryStartIdx)}`;
-}
-
-export default function Navigation() {
+function NavigationComponent(props) {
   const navItems = [
     {
-      href: '/#/profile',
+      href: profilePath,
       iconClass: 'fa-user',
       caption: 'Profile',
     },
     {
-      href: '/#/friends',
+      href: friendsPath,
       iconClass: 'fa-users',
       caption: 'Friends',
     },
     {
-      href: '/#/search',
+      href: searchPath,
       iconClass: 'fa-search',
       caption: 'Search',
     },
   ];
-  const curPath = getNavPath();
 
   return (
     <div className="navigation">
       <ul>
         {
           navItems.map((item, idx) => (
-            <li className={`${curPath === item.href ? 'active' : ''}`} key={idx}>
-              <a href={item.href} className="button rectangular">
-                <i className={`fa ${item.iconClass}`}></i>
-                {item.caption}
-              </a>
-            </li>
+            <Link
+              key={item.href}
+              to={item.href}
+              className="button rectangular"
+              activeClassName="active"
+              onlyActiveOnIndex={false}
+            >
+              <i className={`fa ${item.iconClass}`} />
+              {item.caption}
+            </Link>
           ))
         }
       </ul>
     </div>
   );
 }
+
+NavigationComponent.propTypes = {
+  router: React.PropTypes.object.isRequired,
+};
+
+export default withRouter(NavigationComponent);

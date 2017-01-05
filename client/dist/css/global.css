@@ -1793,7 +1793,7 @@ body a:not(:hover) {
 .navigation:not([class*="th-"]) {
   background-color: #2b5279;
 }
-.navigation:not([class*="th-"]) .active .button {
+.navigation:not([class*="th-"]) .button.active {
   background-color: #26486a;
 }
 .navigation:not([class*="th-"]) .button {
