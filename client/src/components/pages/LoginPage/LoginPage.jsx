@@ -1,5 +1,5 @@
 import React from 'react';
-import CheckAuthorizePage from "../common/CheckAuthorizePage";
+import CheckAuthorizePage from "../../common/CheckAuthorizePage";
 
 class LoginPage extends React.Component {
   render() {

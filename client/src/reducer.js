@@ -11,7 +11,8 @@ export default function(state, action) {
 function getDefaultState() {
   return fromJS({
     authorization: {
-      isChecked: false,
+      isChecked: true,
+      isUserAuthorized: true,
     }
   });
 }

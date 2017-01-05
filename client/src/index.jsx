@@ -5,11 +5,14 @@ import {createStore} from 'redux';
 import {Provider} from 'react-redux';
 import reducer from './reducer';
 import App from './components/App';
-import LoginPage from './components/pages/LoginPage';
-import ProfilePage from './components/pages/ProfilePage';
-import FriendsPage from './components/pages/FriendsPage';
-import SearchPage from './components/pages/SearchPage';
-import {PATHS} from './constants';
+import LoginPage from './components/pages/LoginPage/LoginPage';
+import ProfilePage from './components/pages/ProfilePage/ProfilePage';
+import FriendsPage from './components/pages/FriendsPage/FriendsPage';
+import SearchPage from './components/pages/SearchPage/SearchPage';
+import loginPath from "./components/pages/LoginPage/loginPath";
+import friendsPath from "./components/pages/FriendsPage/friendsPath";
+import profilePath, { routerPath as profilePathWithParam } from './components/pages/ProfilePage/profilePath';
+import searchPath from "./components/pages/SearchPage/searchPath";
 
 const store = createStore(reducer);
 
@@ -17,12 +20,12 @@ ReactDOM.render(
   <Provider store={store}>
     <Router history={hashHistory}>
       <Route path="" component={App}>
-        <Route path={PATHS.LOGIN} component={LoginPage} />
-        <Route path={PATHS.PROFILE} component={ProfilePage} />
-        <Route path={PATHS.FRIENDS} component={FriendsPage} />
-        <Route path={PATHS.SEARCH} component={SearchPage} />
-        <Redirect from="/" to={PATHS.PROFILE} />
-        <Redirect from="/*" to={PATHS.PROFILE} />
+        <Route path={loginPath} component={LoginPage} />
+        <Route path={profilePathWithParam} component={ProfilePage} />
+        <Route path={friendsPath} component={FriendsPage} />
+        <Route path={searchPath} component={SearchPage} />
+        <Redirect from="/" to={profilePath} />
+        <Redirect from="/*" to={profilePath} />
       </Route>
     </Router>
   </Provider>,

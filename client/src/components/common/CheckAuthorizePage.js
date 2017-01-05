@@ -1,10 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { PATHS } from '../../constants';
+import loginPath from "../pages/LoginPage/loginPath";
+import profilePath from "../pages/ProfilePage/profilePath";
 
-const REDIRECT_UNAUTH_PATH = PATHS.LOGIN;
-const REDIRECT_AUTH_PATH = PATHS.PROFILE;
+const REDIRECT_UNAUTH_PATH = loginPath;
+const REDIRECT_AUTH_PATH = profilePath;
 
 export default (isPageForAuthUsers) => (WrappedComponent) => {
   class CheckAuthorizePageComponent extends React.Component {

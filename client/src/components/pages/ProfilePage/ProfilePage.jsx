@@ -1,6 +1,6 @@
 import React from 'react';
-import Navigation from '../Navigation';
-import CheckAuthorizePage from "../common/CheckAuthorizePage";
+import Navigation from '../../Navigation';
+import CheckAuthorizePage from "../../common/CheckAuthorizePage";
 
 class ProfilePage extends React.Component {
   render() {
