@@ -13,6 +13,7 @@ import loginPath from "./components/pages/LoginPage/loginPath";
 import friendsPath from "./components/pages/FriendsPage/friendsPath";
 import profilePath, { routerPath as profilePathWithParam } from './components/pages/ProfilePage/profilePath';
 import searchPath from "./components/pages/SearchPage/searchPath";
+import './css/global.css';
 
 const store = createStore(reducer);
 

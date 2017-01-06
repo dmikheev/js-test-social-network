@@ -1673,10 +1673,7 @@
   content: "\f20c";
 }
 html,
-body,
-.app-root,
-.page,
-.ui {
+body {
   height: 100%;
 }
 body,
@@ -1955,11 +1952,6 @@ a.button.rectangular {
 }
 a.button.rectangular i:first-child {
   margin-right: 10px;
-}
-.navigation a.button.rectangular i:first-child {
-  display: inline-block;
-  width: 15px;
-  text-align: center;
 }
 a.button.rectangular i:last-child {
   margin-left: 10px;
