@@ -1,8 +1,9 @@
 import React from 'react';
 
 import Navigation from '../../Navigation';
+import CheckAuthorizePage from "../../common/CheckAuthorizePage";
 
-export default class FriendsPage extends React.Component {
+class FriendsPage extends React.Component {
   render() {
     return (
       <div className="ui">
@@ -76,3 +77,5 @@ export default class FriendsPage extends React.Component {
     );
   }
 }
+
+export default CheckAuthorizePage(true)(FriendsPage);

@@ -1,8 +1,9 @@
 import React from 'react';
 
 import Navigation from '../../Navigation';
+import CheckAuthorizePage from "../../common/CheckAuthorizePage";
 
-export default class SearchPage extends React.Component {
+class SearchPage extends React.Component {
   render() {
     return (
       <div className="ui">
@@ -38,3 +39,5 @@ export default class SearchPage extends React.Component {
     );
   }
 }
+
+export default CheckAuthorizePage(true)(SearchPage);

@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import loginPath from "../pages/LoginPage/loginPath";
 import profilePath from "../pages/ProfilePage/profilePath";
+import {checkAuthorizationIfNeeded} from "../../actions";
 
 const REDIRECT_UNAUTH_PATH = loginPath;
 const REDIRECT_AUTH_PATH = profilePath;
@@ -32,7 +33,12 @@ export default (isPageForAuthUsers) => (WrappedComponent) => {
     }
 
     checkAuth() {
-      if (!this.props.isAuthChecked || this.props.isUserAuthorized === isPageForAuthUsers) {
+      if (!this.props.isAuthChecked) {
+        this.props.checkAuthorization();
+        return;
+      }
+
+      if (this.props.isUserAuthorized === isPageForAuthUsers) {
         return;
       }
 
@@ -47,5 +53,13 @@ export default (isPageForAuthUsers) => (WrappedComponent) => {
     };
   }
 
-  return connect(mapStateToProps)(withRouter(CheckAuthorizePageComponent));
+  function mapDispatchToProps(dispatch) {
+    return {
+      checkAuthorization() {
+        dispatch(checkAuthorizationIfNeeded());
+      },
+    };
+  }
+
+  return connect(mapStateToProps, mapDispatchToProps)(withRouter(CheckAuthorizePageComponent));
 };

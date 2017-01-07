@@ -15,12 +15,12 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        exclude: /\.useable\.css$/,
-        loader: 'style-loader!css-loader!postcss-loader'
+        exclude: /global\.css$/,
+        loader: 'style-loader!css-loader?modules&localIdentName=[name]_[local]_[hash:base64]!postcss-loader'
       },
       {
-        test: /\.useable\.css$/,
-        loader: 'style-loader/useable!css-loader!postcss-loader',
+        test: /global\.css$/,
+        loader: 'style-loader!css-loader!postcss-loader'
       }
     ]
   },

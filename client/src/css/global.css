@@ -1714,6 +1714,7 @@ body a:not(:hover) {
   vertical-align: middle;
 }
 .ui {
+  height: 100%;
   background-color: #fafafa;
 }
 .ui .login {
