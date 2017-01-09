@@ -13,7 +13,6 @@ function handleAuthorizationCheckResponse(isUserAuthorized) {
   };
 }
 
-
 export function checkAuthorizationIfNeeded() {
   return (dispatch, getState) => {
     if (shouldCheckAuthorization(getState())) {
@@ -29,7 +28,37 @@ function shouldCheckAuthorization(state) {
 function checkAuthorization() {
   return (dispatch) => {
     dispatch(requestAuthorizationCheck());
-    return fetch('/api/user/get')
-      .then(response => dispatch(handleAuthorizationCheckResponse(response.status !== 401)));
+    return fetch('/api/user/get', {
+      credentials: 'same-origin',
+    })
+      .then(response => dispatch(handleAuthorizationCheckResponse(response.ok)));
+  };
+}
+
+export const HANDLE_AUTHORIZATION_RESPONSE = 'HANDLE_AUTHORIZATION_RESPONSE';
+function handleAuthorizationResponse(data) {
+  return {
+    type: HANDLE_AUTHORIZATION_RESPONSE,
+    data,
+  };
+}
+
+export function sendAuthorizationRequest(login, pass, firstName, lastName) {
+  return (dispatch) => {
+    return fetch('/api/auth', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        login,
+        pass,
+        name: firstName,
+        lastname: lastName,
+      }),
+    })
+      .then(response => (response.ok ? response.json() : null))
+      .then(json => dispatch(handleAuthorizationResponse(json)));
   };
 }

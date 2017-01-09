@@ -1,5 +1,9 @@
 import {fromJS} from 'immutable';
-import {REQUEST_AUTHORIZATION_CHECK, HANDLE_AUTHORIZATION_CHECK_RESPONSE} from './actions';
+import {
+  REQUEST_AUTHORIZATION_CHECK,
+  HANDLE_AUTHORIZATION_CHECK_RESPONSE,
+  HANDLE_AUTHORIZATION_RESPONSE,
+} from './actions';
 
 export default function(state, action) {
   if (!state) {
@@ -16,6 +20,18 @@ export default function(state, action) {
         isFetching: false,
         isChecked: true,
         isUserAuthorized: action.data.isUserAuthorized,
+      });
+    }
+
+    case HANDLE_AUTHORIZATION_RESPONSE: {
+      if (!action.data) {
+        return state;
+      }
+
+      return state.mergeIn(['authorization'], {
+        isFetching: false,
+        isChecked: true,
+        isUserAuthorized: true,
       });
     }
 
