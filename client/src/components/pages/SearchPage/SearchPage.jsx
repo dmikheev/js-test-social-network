@@ -3,7 +3,7 @@ import React from 'react';
 import Navigation from '../../Navigation';
 import CheckAuthorizePage from "../../common/CheckAuthorizePage";
 
-class SearchPage extends React.Component {
+class SearchPage extends React.PureComponent {
   render() {
     return (
       <div className="ui">

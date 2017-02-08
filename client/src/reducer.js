@@ -2,7 +2,7 @@ import {fromJS} from 'immutable';
 import {
   REQUEST_AUTHORIZATION_CHECK,
   HANDLE_AUTHORIZATION_CHECK_RESPONSE,
-  HANDLE_AUTHORIZATION_RESPONSE,
+  HANDLE_AUTHORIZATION_RESPONSE, REQUEST_PROFILE_PAGE_DATA, REQUEST_PROFILE_PAGE_DATA_RESPONSE
 } from './actions';
 
 export default function(state, action) {
@@ -18,7 +18,7 @@ export default function(state, action) {
     case HANDLE_AUTHORIZATION_CHECK_RESPONSE: {
       return state.mergeIn(['authorization'], {
         isFetching: false,
-        isChecked: true,
+        didInvalidate: false,
         isUserAuthorized: action.data.isUserAuthorized,
       });
     }
@@ -30,8 +30,22 @@ export default function(state, action) {
 
       return state.mergeIn(['authorization'], {
         isFetching: false,
-        isChecked: true,
+        didInvalidate: false,
         isUserAuthorized: true,
+      });
+    }
+
+    case REQUEST_PROFILE_PAGE_DATA: {
+      return state.setIn(['profilePage', 'isFetching'], true);
+    }
+
+    case REQUEST_PROFILE_PAGE_DATA_RESPONSE: {
+      return state.mergeIn(['profilePage'], {
+        isFetching: false,
+        didInvalidate: false,
+        firstName: action.data.user.name,
+        lastName: action.data.user.lastname,
+        regDate: action.data.user.regDate,
       });
     }
 
@@ -43,10 +57,12 @@ function getDefaultState() {
   return fromJS({
     authorization: {
       isFetching: false,
-      isChecked: false,
+      didInvalidate: true,
       isUserAuthorized: null,
     },
     profilePage: {
+      isFetching: false,
+      didInvalidate: true,
       firstName: 'Danil',
       lastName: 'Chunikhin',
       regDate: '12/10/2014',

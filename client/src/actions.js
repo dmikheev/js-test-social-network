@@ -23,7 +23,11 @@ export function checkAuthorizationIfNeeded() {
   };
 }
 function shouldCheckAuthorization(state) {
-  return !state.getIn(['authorization', 'isChecked']) && !state.getIn(['authorization', 'isFetching']);
+  if (state.getIn(['authorization', 'isFetching'])) {
+    return false;
+  }
+
+  return state.getIn(['authorization', 'didInvalidate']);
 }
 function checkAuthorization() {
   return (dispatch) => {
@@ -61,4 +65,46 @@ export function sendAuthorizationRequest(login, pass, firstName, lastName) {
       .then(response => (response.ok ? response.json() : null))
       .then(json => dispatch(handleAuthorizationResponse(json)));
   };
+}
+
+export const REQUEST_PROFILE_PAGE_DATA = 'REQUEST_PROFILE_PAGE_DATA';
+function requestProfilePageData() {
+  return {
+    type: REQUEST_PROFILE_PAGE_DATA,
+  }
+}
+
+export const REQUEST_PROFILE_PAGE_DATA_RESPONSE = 'REQUEST_PROFILE_PAGE_DATA_RESPONSE';
+function requestProfilePageDataResponse(user) {
+  return {
+    type: REQUEST_PROFILE_PAGE_DATA_RESPONSE,
+    data: { user },
+  }
+}
+
+function fetchProfilePageData() {
+  return dispatch => {
+    dispatch(requestProfilePageData());
+    return fetch('/api/user/get', {
+      credentials: 'same-origin',
+    })
+      .then(response => response.json())
+      .then(json => dispatch(requestProfilePageDataResponse(json)));
+  }
+}
+function shouldFetchProfilePageData(state) {
+  if (state.getIn(['profilePage', 'isFetching'])) {
+    return false;
+  }
+
+  return state.getIn(['profilePage', 'didInvalidate']);
+}
+export function fetchProfilePageDataIfNeeded() {
+  return (dispatch, getState) => {
+    if (shouldFetchProfilePageData(getState())) {
+      return dispatch(fetchProfilePageData())
+    } else {
+      return Promise.resolve()
+    }
+  }
 }

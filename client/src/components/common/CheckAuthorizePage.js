@@ -48,7 +48,7 @@ export default (isPageForAuthUsers) => (WrappedComponent) => {
 
   function mapStateToProps(state) {
     return {
-      isAuthChecked: state.getIn(['authorization', 'isChecked']),
+      isAuthChecked: !state.getIn(['authorization', 'didInvalidate']),
       isUserAuthorized: state.getIn(['authorization', 'isUserAuthorized']),
     };
   }

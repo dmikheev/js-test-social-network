@@ -3,7 +3,7 @@ import CheckAuthorizePage from '../../common/CheckAuthorizePage';
 import {connect} from 'react-redux';
 import {sendAuthorizationRequest} from '../../../actions';
 
-class LoginPage extends React.Component {
+class LoginPage extends React.PureComponent {
   constructor(...args) {
     super(...args);
 
@@ -15,7 +15,14 @@ class LoginPage extends React.Component {
     };
 
     this.onInput = this.onInput.bind(this);
-    this.onButtonClick = this.onButtonClick.bind(this);
+    this.onFormSubmit = this.onFormSubmit.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
+  }
+
+  onKeyDown(event) {
+    if (event.keyCode === 13) {
+      this.onFormSubmit();
+    }
   }
 
   onInput(event) {
@@ -24,8 +31,8 @@ class LoginPage extends React.Component {
     });
   }
 
-  onButtonClick() {
-    this.props.onButtonClick(this.state.login, this.state.pass, this.state.name, this.state.lastname);
+  onFormSubmit() {
+    this.props.onFormSubmit(this.state.login, this.state.pass, this.state.name, this.state.lastname);
   }
 
   render() {
@@ -35,18 +42,18 @@ class LoginPage extends React.Component {
           <div>
             <div className="substrate">
               <div className="textbox">
-                <input id="name" type="text" placeholder="Name" onInput={this.onInput} />
+                <input id="name" type="text" placeholder="Name" onInput={this.onInput} onKeyDown={this.onKeyDown} />
               </div>
               <div className="textbox">
-                <input id="lastname" type="text" placeholder="Last name" onInput={this.onInput} />
+                <input id="lastname" type="text" placeholder="Last name" onInput={this.onInput} onKeyDown={this.onKeyDown} />
               </div>
               <div className="textbox icon"><i className="fa fa-user"></i>
-                <input id="login" type="text" placeholder="Login" onInput={this.onInput} />
+                <input id="login" type="text" placeholder="Login" onInput={this.onInput} onKeyDown={this.onKeyDown} />
               </div>
               <div className="textbox icon"><i className="fa fa-lock"></i>
-                <input id="pass" type="password" placeholder="Password" onInput={this.onInput} />
+                <input id="pass" type="password" placeholder="Password" onInput={this.onInput} onKeyDown={this.onKeyDown} />
               </div>
-              <button id="button" className="rectangular green" onClick={this.onButtonClick}>
+              <button id="button" className="rectangular green" onClick={this.onFormSubmit}>
                 <i className="fa fa-sign-in" />
                 <span>Log In</span>
               </button>
@@ -60,7 +67,7 @@ class LoginPage extends React.Component {
 
 function mapDispatchToProps(dispatch) {
   return {
-    onButtonClick(login, pass, name, lastName) {
+    onFormSubmit(login, pass, name, lastName) {
       dispatch(sendAuthorizationRequest(login, pass, name, lastName));
     },
   };

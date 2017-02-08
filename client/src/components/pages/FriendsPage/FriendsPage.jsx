@@ -3,7 +3,7 @@ import React from 'react';
 import Navigation from '../../Navigation';
 import CheckAuthorizePage from "../../common/CheckAuthorizePage";
 
-class FriendsPage extends React.Component {
+class FriendsPage extends React.PureComponent {
   render() {
     return (
       <div className="ui">
