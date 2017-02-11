@@ -6,10 +6,10 @@ function requestAuthorizationCheck() {
 }
 
 export const HANDLE_AUTHORIZATION_CHECK_RESPONSE = 'HANDLE_AUTHORIZATION_CHECK_RESPONSE';
-function handleAuthorizationCheckResponse(isUserAuthorized) {
+function handleAuthorizationCheckResponse(isUserAuthorized, user) {
   return {
     type: HANDLE_AUTHORIZATION_CHECK_RESPONSE,
-    data: { isUserAuthorized },
+    data: { isUserAuthorized, user },
   };
 }
 
@@ -35,7 +35,15 @@ function checkAuthorization() {
     return fetch('/api/user/get', {
       credentials: 'same-origin',
     })
-      .then(response => dispatch(handleAuthorizationCheckResponse(response.ok)));
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('unauthorized');
+        }
+
+        return response.json();
+      })
+      .then(json => dispatch(handleAuthorizationCheckResponse(true, json)))
+      .catch(() => dispatch(handleAuthorizationCheckResponse(false)));
   };
 }
 
@@ -103,6 +111,48 @@ export function fetchProfilePageDataIfNeeded() {
   return (dispatch, getState) => {
     if (shouldFetchProfilePageData(getState())) {
       return dispatch(fetchProfilePageData())
+    } else {
+      return Promise.resolve()
+    }
+  }
+}
+
+export const REQUEST_FRIENDS_PAGE_DATA = 'REQUEST_FRIENDS_PAGE_DATA';
+function requestFriendsPageData() {
+  return {
+    type: REQUEST_FRIENDS_PAGE_DATA,
+  }
+}
+
+export const REQUEST_FRIENDS_PAGE_DATA_RESPONSE = 'REQUEST_FRIENDS_PAGE_DATA_RESPONSE';
+function requestFriendsPageDataResponse(friendships) {
+  return {
+    type: REQUEST_FRIENDS_PAGE_DATA_RESPONSE,
+    data: { friendships },
+  }
+}
+
+function fetchFriendsPageData() {
+  return dispatch => {
+    dispatch(requestFriendsPageData());
+    return fetch('/api/friendships/getAll', {
+      credentials: 'same-origin',
+    })
+      .then(response => response.json())
+      .then(json => dispatch(requestFriendsPageDataResponse(json)));
+  }
+}
+function shouldFetchFriendsPageData(state) {
+  if (state.getIn(['friendsPage', 'isFetching'])) {
+    return false;
+  }
+
+  return state.getIn(['friendsPage', 'didInvalidate']);
+}
+export function fetchFriendsPageDataIfNeeded() {
+  return (dispatch, getState) => {
+    if (shouldFetchFriendsPageData(getState())) {
+      return dispatch(fetchFriendsPageData())
     } else {
       return Promise.resolve()
     }

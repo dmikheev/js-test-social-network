@@ -1,10 +1,21 @@
 import React from 'react';
-
+import {connect} from 'react-redux';
 import Navigation from '../../Navigation';
 import CheckAuthorizePage from "../../common/CheckAuthorizePage";
+import {fetchFriendsPageDataIfNeeded} from '../../../actions';
 
 class FriendsPage extends React.PureComponent {
+  componentDidMount() {
+    if (this.props.didInvalidate) {
+      this.props.onDataInvalidate();
+    }
+  }
+
   render() {
+    if (this.props.didInvalidate) {
+      return <div>Loading...</div>;
+    }
+
     return (
       <div className="ui">
         <Navigation/>
@@ -16,18 +27,15 @@ class FriendsPage extends React.PureComponent {
                   <h1>Inbox</h1>
                   <div className="list-of-users">
                     <ul>
-                      <li><a href="/"><span>Konstantin Konstantinov</span></a>
-                        <div className="control">
-                          <button className="clear"><i className="fa fa-check"></i></button>
-                          <button className="clear"><i className="fa fa-times"></i></button>
-                        </div>
-                      </li>
-                      <li><a href="/"><span>Daniel Danilevsky</span></a>
-                        <div className="control">
-                          <button className="clear"><i className="fa fa-check"></i></button>
-                          <button className="clear"><i className="fa fa-times"></i></button>
-                        </div>
-                      </li>
+                      {this.props.inbox.map((friendship) => (
+                        <li key={friendship.sender.id}>
+                          <a href="/">{friendship.sender.name} {friendship.sender.lastname}</a>
+                          <div className="control">
+                            <button className="clear"><i className="fa fa-check"></i></button>
+                            <button className="clear"><i className="fa fa-times"></i></button>
+                          </div>
+                        </li>
+                      ))}
                     </ul>
                   </div>
                 </div>
@@ -37,16 +45,15 @@ class FriendsPage extends React.PureComponent {
                   <h1>Outbox</h1>
                   <div className="list-of-users">
                     <ul>
-                      <li><a href="/"><span>Nastassja Kotinskaya</span></a>
-                        <div className="control">
-                          <button className="clear"><i className="fa fa-times"></i></button>
-                        </div>
-                      </li>
-                      <li><a href="/"><span>Luba Ljubasha</span></a>
-                        <div className="control">
-                          <button className="clear"><i className="fa fa-times"></i></button>
-                        </div>
-                      </li>
+                      {this.props.outbox.map((friendship) => (
+                        <li key={friendship.receiver.id}>
+                          <a href="/">{friendship.receiver.name} {friendship.receiver.lastname}</a>
+                          <div className="control">
+                            <button className="clear"><i className="fa fa-check"></i></button>
+                            <button className="clear"><i className="fa fa-times"></i></button>
+                          </div>
+                        </li>
+                      ))}
                     </ul>
                   </div>
                 </div>
@@ -56,16 +63,20 @@ class FriendsPage extends React.PureComponent {
                   <h1>My Friends</h1>
                   <div className="list-of-users">
                     <ul>
-                      <li><a href="/"><span>Vladimir Zhirinovsky</span></a>
-                        <div className="control">
-                          <button className="clear"><i className="fa fa-times"></i><span>Remove from friends</span></button>
-                        </div>
-                      </li>
-                      <li><a href="/"><span>Vladimir Putin</span></a>
-                        <div className="control">
-                          <button className="clear"><i className="fa fa-times"></i><span>Remove from friends</span></button>
-                        </div>
-                      </li>
+                      {this.props.friends.map((friendship) => {
+                        const anotherUser = friendship.sender.id === this.props.currentUserId ?
+                          friendship.receiver : friendship.sender;
+
+                        return (
+                          <li key={anotherUser.id}>
+                            <a href="/">{anotherUser.name} {anotherUser.lastname}</a>
+                            <div className="control">
+                              <button className="clear"><i className="fa fa-check"></i></button>
+                              <button className="clear"><i className="fa fa-times"></i></button>
+                            </div>
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 </div>
@@ -77,5 +88,32 @@ class FriendsPage extends React.PureComponent {
     );
   }
 }
+FriendsPage.propTypes = {
+  didInvalidate: React.PropTypes.bool.isRequired,
+  inbox: React.PropTypes.array.isRequired,
+  outbox: React.PropTypes.array.isRequired,
+  friends: React.PropTypes.array.isRequired,
+  currentUserId: React.PropTypes.string.isRequired,
+};
 
-export default CheckAuthorizePage(true)(FriendsPage);
+function mapStateToProps(state) {
+  const friendsPageState = state.getIn(['friendsPage']).toJS();
+
+  return {
+    currentUserId: state.getIn(['authorization', 'userId']),
+    didInvalidate: friendsPageState.didInvalidate,
+    inbox: friendsPageState.inbox,
+    outbox: friendsPageState.outbox,
+    friends: friendsPageState.friends,
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    onDataInvalidate() {
+      dispatch(fetchFriendsPageDataIfNeeded());
+    }
+  };
+}
+
+export default CheckAuthorizePage(true)(connect(mapStateToProps, mapDispatchToProps)(FriendsPage));

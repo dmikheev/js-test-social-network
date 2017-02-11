@@ -61,7 +61,10 @@ function loginUser(req, res, user, next, isJustRegistered) {
       return next(err);
 
     if (isJustRegistered) {
-      return res.json({ operation: RESULT_TYPE.REGISTER });
+      return res.json({
+        operation: RESULT_TYPE.REGISTER,
+        user: getUserResponseData(user),
+      });
     }
 
     var newName, newLastname;
@@ -73,7 +76,10 @@ function loginUser(req, res, user, next, isJustRegistered) {
     }
 
     if (!newName && !newLastname) {
-      return res.json({ operation: RESULT_TYPE.LOGIN });
+      return res.json({
+        operation: RESULT_TYPE.LOGIN,
+        user: getUserResponseData(user),
+      });
     }
 
     if (newName) {
@@ -85,9 +91,21 @@ function loginUser(req, res, user, next, isJustRegistered) {
     }
 
     user.save(function(err) {
-      return err ? next(err) : res.json({ operation: RESULT_TYPE.LOGIN });
+      return err ? next(err) : res.json({
+        operation: RESULT_TYPE.LOGIN,
+        user: getUserResponseData(user),
+      });
     });
   });
+}
+
+function getUserResponseData(user) {
+  return {
+    id: user._id,
+    name: user.name,
+    lastname: user.lastname,
+    regDate: new Date(user.regDate).toLocaleDateString(),
+  }
 }
 
 module.exports = auth;

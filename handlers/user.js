@@ -17,6 +17,7 @@ function getById(req, res, next) {
       return err ?
         next(err) :
         res.json({
+          id: userId,
           name: user.name,
           lastname: user.lastname,
           regDate: new Date(user.regDate).toLocaleDateString(),

@@ -34,6 +34,7 @@ friendshipSchema.statics.getItemsForUser = function(userId, populate, callback) 
   var senderQuery = this.find({ senderId: userId });
 
   if (populate) {
+    senderQuery.populate('senderId', 'name lastname');
     senderQuery.populate('receiverId', 'name lastname');
   }
 
@@ -47,6 +48,7 @@ friendshipSchema.statics.getItemsForUser = function(userId, populate, callback) 
 
     if (populate) {
       receiverQuery.populate('senderId', 'name lastname');
+      receiverQuery.populate('receiverId', 'name lastname');
     }
 
     receiverQuery.exec(function(err, receiverResults) {
@@ -72,19 +74,42 @@ function constructResultForUser(senderResults, receiverResults) {
 
   for (var i = 0; i < senderResults.length; i++) {
     if (senderResults[i].accepted) {
-      result.friends.push(senderResults[i]);
+      result.friends.push(constructFriendshipResult(senderResults[i]));
     } else {
-      result.outcoming.push(senderResults[i]);
+      result.outcoming.push(constructFriendshipResult(senderResults[i]));
     }
   };
 
   for (var i = 0; i < receiverResults.length; i++) {
     if (receiverResults[i].accepted) {
-      result.friends.push(receiverResults[i]);
+      result.friends.push(constructFriendshipResult(receiverResults[i]));
     } else {
-      result.incoming.push(receiverResults[i]);
+      result.incoming.push(constructFriendshipResult(receiverResults[i]));
     }
   };
 
   return result;
+}
+
+function constructFriendshipResult(friendshipData) {
+  return {
+    id: friendshipData._id,
+    accepted: friendshipData.accepted,
+    sender: constructFriendshipUserResult(friendshipData.senderId),
+    receiver: constructFriendshipUserResult(friendshipData.receiverId),
+  };
+}
+
+function constructFriendshipUserResult(userData) {
+  if (userData.name) {
+    return {
+      id: userData._id,
+      name: userData.name,
+      lastname: userData.lastname,
+    };
+  } else {
+    return {
+      id: userData,
+    };
+  }
 }
