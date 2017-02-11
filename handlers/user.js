@@ -1,3 +1,5 @@
+const UserPresenter = require('./presenters/userPresenter');
+
 /**
  * Обработчик запроса на получение профиля пользователя.
  */
@@ -16,12 +18,7 @@ function getById(req, res, next) {
     function(err, user) {
       return err ?
         next(err) :
-        res.json({
-          id: userId,
-          name: user.name,
-          lastname: user.lastname,
-          regDate: new Date(user.regDate).toLocaleDateString(),
-        });
+        res.json(UserPresenter.getData(user));
     }
   );
 }

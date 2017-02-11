@@ -1,3 +1,5 @@
+const UserPresenter = require('../handlers/presenters/userPresenter');
+
 /**
  * Модель дружбы для mongoose
  */
@@ -95,21 +97,7 @@ function constructFriendshipResult(friendshipData) {
   return {
     id: friendshipData._id,
     accepted: friendshipData.accepted,
-    sender: constructFriendshipUserResult(friendshipData.senderId),
-    receiver: constructFriendshipUserResult(friendshipData.receiverId),
+    sender: UserPresenter.getData(friendshipData.senderId),
+    receiver: UserPresenter.getData(friendshipData.receiverId),
   };
-}
-
-function constructFriendshipUserResult(userData) {
-  if (userData.name) {
-    return {
-      id: userData._id,
-      name: userData.name,
-      lastname: userData.lastname,
-    };
-  } else {
-    return {
-      id: userData,
-    };
-  }
 }

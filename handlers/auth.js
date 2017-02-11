@@ -1,3 +1,5 @@
+const UserPresenter = require('./presenters/userPresenter');
+
 /**
  * Обработка запроса на логин или регистрацию
  */
@@ -63,7 +65,7 @@ function loginUser(req, res, user, next, isJustRegistered) {
     if (isJustRegistered) {
       return res.json({
         operation: RESULT_TYPE.REGISTER,
-        user: getUserResponseData(user),
+        user: UserPresenter.getData(user),
       });
     }
 
@@ -78,7 +80,7 @@ function loginUser(req, res, user, next, isJustRegistered) {
     if (!newName && !newLastname) {
       return res.json({
         operation: RESULT_TYPE.LOGIN,
-        user: getUserResponseData(user),
+        user: UserPresenter.getData(user),
       });
     }
 
@@ -93,7 +95,7 @@ function loginUser(req, res, user, next, isJustRegistered) {
     user.save(function(err) {
       return err ? next(err) : res.json({
         operation: RESULT_TYPE.LOGIN,
-        user: getUserResponseData(user),
+        user: UserPresenter.getData(user),
       });
     });
   });
