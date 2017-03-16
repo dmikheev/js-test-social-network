@@ -1,4 +1,6 @@
 const UserPresenter = require('../handlers/presenters/userPresenter');
+const WrongUserAcceptFriendshipError = require('../errors/wrongUserAcceptFriendshipError');
+const WrongUserDeclineFriendshipError = require('../errors/wrongUserDeclineFriendshipError');
 
 /**
  * Модель дружбы для mongoose
@@ -21,6 +23,46 @@ var friendshipSchema = mongoose.Schema({
 
 friendshipSchema.index({ senderId: 1 });
 friendshipSchema.index({ receiverId: 1 });
+
+friendshipSchema.methods.accept = function(acceptedUserId, cb) {
+  if (this.receiverId != acceptedUserId) {
+    return cb(new WrongUserAcceptFriendshipError());
+  }
+
+  if (this.accepted) {
+    return cb();
+  }
+
+  this.accepted = true;
+  return this.save(cb);
+};
+
+friendshipSchema.methods.decline = function(declinedUserId, cb) {
+  if (this.accepted) {
+    if (this.senderId != declinedUserId &&
+      this.receiverId != declinedUserId
+    ) {
+      return cb(new WrongUserDeclineFriendshipError());
+    }
+
+    if (this.receiverId == declinedUserId) {
+      this.accepted = false;
+      return this.save((err) => cb(err, this));
+    } else {
+      this.senderId = this.receiverId;
+      this.receiverId = declinedUserId;
+      this.accepted = false;
+
+      return this.save((err) => cb(err, this));
+    }
+  } else {
+    if (this.senderId != declinedUserId) {
+      return cb(new WrongUserDeclineFriendshipError());
+    }
+
+    return this.remove((err) => cb(err));
+  }
+};
 
 /**
  * Получаем объект с заявками и друзьями пользователя

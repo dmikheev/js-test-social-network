@@ -1,10 +1,5 @@
 import {fromJS} from 'immutable';
-import {
-  REQUEST_AUTHORIZATION_CHECK,
-  HANDLE_AUTHORIZATION_CHECK_RESPONSE,
-  HANDLE_AUTHORIZATION_RESPONSE, REQUEST_PROFILE_PAGE_DATA, REQUEST_PROFILE_PAGE_DATA_RESPONSE,
-  REQUEST_FRIENDS_PAGE_DATA, REQUEST_FRIENDS_PAGE_DATA_RESPONSE
-} from './actions';
+import * as ACTIONS from './actions';
 
 export default function(state, action) {
   if (!state) {
@@ -12,11 +7,11 @@ export default function(state, action) {
   }
 
   switch (action.type) {
-    case REQUEST_AUTHORIZATION_CHECK: {
+    case ACTIONS.REQUEST_AUTHORIZATION_CHECK: {
       return state.setIn(['authorization', 'isFetching'], true);
     }
 
-    case HANDLE_AUTHORIZATION_CHECK_RESPONSE: {
+    case ACTIONS.HANDLE_AUTHORIZATION_CHECK_RESPONSE: {
       return state.mergeIn(['authorization'], {
         isFetching: false,
         didInvalidate: false,
@@ -25,7 +20,7 @@ export default function(state, action) {
       });
     }
 
-    case HANDLE_AUTHORIZATION_RESPONSE: {
+    case ACTIONS.HANDLE_AUTHORIZATION_RESPONSE: {
       if (!action.data) {
         return state;
       }
@@ -38,11 +33,11 @@ export default function(state, action) {
       });
     }
 
-    case REQUEST_PROFILE_PAGE_DATA: {
+    case ACTIONS.REQUEST_PROFILE_PAGE_DATA: {
       return state.setIn(['profilePage', 'isFetching'], true);
     }
 
-    case REQUEST_PROFILE_PAGE_DATA_RESPONSE: {
+    case ACTIONS.REQUEST_PROFILE_PAGE_DATA_RESPONSE: {
       return state.mergeIn(['profilePage'], {
         isFetching: false,
         didInvalidate: false,
@@ -52,11 +47,11 @@ export default function(state, action) {
       });
     }
 
-    case REQUEST_FRIENDS_PAGE_DATA: {
+    case ACTIONS.REQUEST_FRIENDS_PAGE_DATA: {
       return state.setIn(['friendsPage', 'isFetching'], true);
     }
 
-    case REQUEST_FRIENDS_PAGE_DATA_RESPONSE: {
+    case ACTIONS.REQUEST_FRIENDS_PAGE_DATA_RESPONSE: {
       return state.mergeIn(['friendsPage'], {
         isFetching: false,
         didInvalidate: false,
@@ -64,6 +59,26 @@ export default function(state, action) {
         outbox: action.data.friendships.outcoming,
         friends: action.data.friendships.friends,
       });
+    }
+
+    case ACTIONS.ACCEPT_FRIENDSHIP_RESPONSE: {
+      return state
+        .updateIn(['friendsPage', 'inbox'], inbox =>
+          inbox.filter(friendship => friendship.get('id') !== action.data.id))
+        .updateIn(['friendsPage', 'friends'], friends => friends.push(fromJS(action.data)));
+    }
+
+    case ACTIONS.REMOVE_FRIENDSHIP_REQUEST_RESPONSE: {
+      return state
+        .updateIn(['friendsPage', 'outbox'], outbox =>
+          outbox.filter(friendship => friendship.get('id') !== action.data.id));
+    }
+
+    case ACTIONS.REMOVE_FRIENDSHIP_RESPONSE: {
+      return state
+        .updateIn(['friendsPage', 'friends'], friends =>
+          friends.filter(friendship => friendship.get('id') !== action.data.id))
+        .updateIn(['friendsPage', 'inbox'], inbox => inbox.push(fromJS(action.data)));
     }
 
     default: return state;
@@ -85,6 +100,7 @@ function getDefaultState() {
       lastName: '',
       regDate: '',
     },
+    // TODO: refactor (normalize)
     friendsPage: {
       isFetching: false,
       didInvalidate: true,

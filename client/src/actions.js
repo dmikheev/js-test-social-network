@@ -158,3 +158,56 @@ export function fetchFriendsPageDataIfNeeded() {
     }
   }
 }
+
+export const ACCEPT_FRIENDSHIP_RESPONSE = 'ACCEPT_FRIENDSHIP_RESPONSE';
+function acceptFriendshipResponse(friendship) {
+  return {
+    type: ACCEPT_FRIENDSHIP_RESPONSE,
+    data: friendship,
+  }
+}
+
+export function requestAcceptFriendship(friendshipId) {
+  return (dispatch) =>
+    fetch(`/api/friendship/accept/${friendshipId}`, {
+      credentials: 'same-origin',
+      method: 'POST',
+    })
+      .then(response => response.json())
+      .then(json => dispatch(acceptFriendshipResponse(json)));
+}
+
+export const REMOVE_FRIENDSHIP_REQUEST_RESPONSE = 'REMOVE_FRIENDSHIP_REQUEST_RESPONSE';
+const removeFriendshipRequestResponse = () => ({
+  type: REMOVE_FRIENDSHIP_REQUEST_RESPONSE,
+});
+
+export function requestRemoveFriendshipRequest(friendshipId) {
+  return (dispatch) =>
+    fetch(`/api/friendship/decline/${friendshipId}`, {
+      credentials: 'same-origin',
+      method: 'POST',
+    })
+      .then(response =>
+        response.ok ?
+          dispatch(removeFriendshipRequestResponse(json)) :
+          Promise.reject(response));
+}
+
+export const REMOVE_FRIENDSHIP_RESPONSE = 'REMOVE_FRIENDSHIP_RESPONSE';
+function removeFriendshipResponse(newFriendshipData) {
+  return {
+    type: REMOVE_FRIENDSHIP_RESPONSE,
+    data: newFriendshipData,
+  }
+}
+
+export function requestRemoveFriendship(friendshipId) {
+  return (dispatch) =>
+    fetch(`/api/friendship/decline/${friendshipId}`, {
+      credentials: 'same-origin',
+      method: 'POST',
+    })
+      .then(response => response.json())
+      .then(json => dispatch(removeFriendshipResponse(json)));
+}

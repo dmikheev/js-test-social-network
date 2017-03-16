@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import Navigation from '../../Navigation';
 import CheckAuthorizePage from "../../common/CheckAuthorizePage";
-import {fetchFriendsPageDataIfNeeded} from '../../../actions';
+import * as Actions from '../../../actions';
 
 class FriendsPage extends React.PureComponent {
   componentDidMount() {
@@ -31,8 +31,12 @@ class FriendsPage extends React.PureComponent {
                         <li key={friendship.sender.id}>
                           <a href="/">{friendship.sender.name} {friendship.sender.lastname}</a>
                           <div className="control">
-                            <button className="clear"><i className="fa fa-check"></i></button>
-                            <button className="clear"><i className="fa fa-times"></i></button>
+                            <button
+                              className="clear"
+                              onClick={() => this.props.onFriendshipRequestAcceptClick(friendship.id)}
+                            >
+                              <i className="fa fa-check" />
+                            </button>
                           </div>
                         </li>
                       ))}
@@ -49,8 +53,12 @@ class FriendsPage extends React.PureComponent {
                         <li key={friendship.receiver.id}>
                           <a href="/">{friendship.receiver.name} {friendship.receiver.lastname}</a>
                           <div className="control">
-                            <button className="clear"><i className="fa fa-check"></i></button>
-                            <button className="clear"><i className="fa fa-times"></i></button>
+                            <button
+                              className="clear"
+                              onClick={() => this.props.onFriendshipRequestRemoveClick(friendship.id)}
+                            >
+                              <i className="fa fa-times" />
+                            </button>
                           </div>
                         </li>
                       ))}
@@ -71,8 +79,12 @@ class FriendsPage extends React.PureComponent {
                           <li key={anotherUser.id}>
                             <a href="/">{anotherUser.name} {anotherUser.lastname}</a>
                             <div className="control">
-                              <button className="clear"><i className="fa fa-check"></i></button>
-                              <button className="clear"><i className="fa fa-times"></i></button>
+                              <button
+                                className="clear"
+                                onClick={() => this.props.onFriendshipRemoveClick(friendship.id)}
+                              >
+                                <i className="fa fa-times" />
+                              </button>
                             </div>
                           </li>
                         );
@@ -94,6 +106,10 @@ FriendsPage.propTypes = {
   outbox: React.PropTypes.array.isRequired,
   friends: React.PropTypes.array.isRequired,
   currentUserId: React.PropTypes.string.isRequired,
+
+  onDataInvalidate: React.PropTypes.func.isRequired,
+  onFriendshipRequestAcceptClick: React.PropTypes.func.isRequired,
+  onFriendshipRemoveClick: React.PropTypes.func.isRequired,
 };
 
 function mapStateToProps(state) {
@@ -111,8 +127,17 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     onDataInvalidate() {
-      dispatch(fetchFriendsPageDataIfNeeded());
-    }
+      dispatch(Actions.fetchFriendsPageDataIfNeeded());
+    },
+    onFriendshipRequestAcceptClick(friendshipId) {
+      dispatch(Actions.requestAcceptFriendship(friendshipId));
+    },
+    onFriendshipRequestRemoveClick(friendshipId) {
+      dispatch(Actions.requestRemoveFriendshipRequest(friendshipId));
+    },
+    onFriendshipRemoveClick(friendshipId) {
+      dispatch(Actions.requestRemoveFriendship(friendshipId));
+    },
   };
 }
 
