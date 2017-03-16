@@ -1,9 +1,11 @@
-/**
+var User = require('./../models/user');
+var Friendship = require('./../models/friendship');
+const FriendshipPresenter = require('./presenters/friendshipPresenter');
+
+  /**
  * Обработчики запросов на добавление в друзья,
  * подтверждение и удаление дружбы
  */
-var User = require('./../models/user');
-var Friendship = require('./../models/friendship');
 
 /**
  * Заявка на добавление в друзья.
@@ -49,12 +51,7 @@ function request(req, res, next) {
         });
 
         newFriendship.save(function(err) {
-          return err ? next(err) : res.json({
-            _id: newFriendship._id,
-            senderId: newFriendship.senderId,
-            receiverId: newFriendship.receiverId,
-            accepted: newFriendship.accepted
-          });
+          return err ? next(err) : res.json(FriendshipPresenter.getData(newFriendship));
         });
       });
   });
@@ -84,12 +81,7 @@ function accept(req, res, next) {
 
     friendship.accepted = true;
     friendship.save(function(err) {
-      return err ? next(err) : res.json({
-          _id: friendship._id,
-          senderId: friendship.senderId,
-          receiverId: friendship.receiverId,
-          accepted: friendship.accepted
-        });
+      return err ? next(err) : res.json(FriendshipPresenter.getData(friendship));
     });
   });
 }
@@ -117,9 +109,20 @@ function decline(req, res, next) {
         });
     }
 
-    friendship.remove(function(err) {
-      return err ? next(err) : res.status(204).send();
-    });
+    if (friendship.receiverId === req.user.id) {
+      friendship.accepted = false;
+      friendship.save((err) => {
+        return err ? next(err) : res.json(FriendshipPresenter.getData(friendship));
+      });
+    } else {
+      friendship.senderId = friendship.receiverId;
+      friendship.receiverId = req.user.id;
+      friendship.accepted = false;
+
+      friendship.save(function(err) {
+        return err ? next(err) : res.json(FriendshipPresenter.getData(friendship));
+      });
+    }
   });
 }
 
