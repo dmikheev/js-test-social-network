@@ -1,5 +1,5 @@
 module.exports = {
-  getData(user) {
+  getData(user, additionalData = {}) {
     const resultData = {};
 
     if (user._id) {
@@ -15,6 +15,6 @@ module.exports = {
       resultData.regDate = new Date(user.regDate).toLocaleDateString();
     }
 
-    return resultData;
+    return Object.assign(resultData, additionalData);
   },
 };

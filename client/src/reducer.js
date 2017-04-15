@@ -81,6 +81,10 @@ export default function(state, action) {
         .updateIn(['friendsPage', 'inbox'], inbox => inbox.push(fromJS(action.data)));
     }
 
+    case ACTIONS.UPDATE_SEARCH_USERS: {
+      return state.setIn(['searchPage', 'users'], action.data);
+    }
+
     default: return state;
   }
 }

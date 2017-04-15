@@ -5,6 +5,7 @@ var _ = require('underscore');
 
 var User = require('./../models/user');
 var Friendship = require('./../models/friendship');
+const UserPresenter = require('./presenters/userPresenter');
 
 /**
  * Количество пользователей на страницу
@@ -75,7 +76,10 @@ function find(req, res, next) {
             setUserFriendshipStatus(users[i], req.user, friendships);
           };
 
-          return res.json(users);
+          return res.json(users.map((user) => UserPresenter.getData(user, {
+            status: user.status,
+            friendshipId: user.friendshipId,
+          })));
         }
       );
     });
@@ -100,7 +104,7 @@ function setUserFriendshipStatus(candidate, mainUser, friendships) {
 
   var candidateId = candidate._id;
   var incomingFriendship = _.find(friendships.incoming, function(friendship) {
-    return friendship.senderId.id == candidateId.id;
+    return friendship.sender.id == candidateId.id;
   });
   if (incomingFriendship) {
     candidate.status = USER_FRIENDSHIP_STATUS.RECEIVED;
@@ -109,7 +113,7 @@ function setUserFriendshipStatus(candidate, mainUser, friendships) {
   }
   
   var outcomingFriendship = _.find(friendships.outcoming, function(friendship) {
-    return friendship.receiverId.id == candidateId.id;
+    return friendship.receiver.id == candidateId.id;
   });
   if (outcomingFriendship) {
     candidate.status = USER_FRIENDSHIP_STATUS.REQUESTED;
@@ -118,8 +122,8 @@ function setUserFriendshipStatus(candidate, mainUser, friendships) {
   }
 
   var friendFriendship = _.find(friendships.friends, function(friendship) {
-    return friendship.senderId.id == candidateId.id ||
-      friendship.receiverId.id == candidateId.id;
+    return friendship.sender.id == candidateId.id ||
+      friendship.receiver.id == candidateId.id;
   });
   if (friendFriendship) {
     candidate.status = USER_FRIENDSHIP_STATUS.FRIEND;

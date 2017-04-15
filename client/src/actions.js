@@ -211,3 +211,19 @@ export function requestRemoveFriendship(friendshipId) {
       .then(response => response.json())
       .then(json => dispatch(removeFriendshipResponse(json)));
 }
+
+export const UPDATE_SEARCH_USERS = 'UPDATE_SEARCH_USERS';
+const updateSearchUsers = (users) => ({
+  type: UPDATE_SEARCH_USERS,
+  data: users,
+});
+
+export function requestUsersSearch(searchQuery) {
+  return (dispatch) =>
+    fetch(`/api/users/find/${searchQuery}`, {
+      credentials: 'same-origin',
+      method: 'GET',
+    })
+      .then(response => response.json())
+      .then(json => dispatch(updateSearchUsers(json)));
+}
