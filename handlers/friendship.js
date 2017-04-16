@@ -1,9 +1,13 @@
-/**
+var User = require('./../models/user');
+var Friendship = require('./../models/friendship');
+const FriendshipPresenter = require('./presenters/friendshipPresenter');
+const WrongUserAcceptFriendshipError = require('../errors/wrongUserAcceptFriendshipError');
+const WrongUserDeclineFriendshipError = require('../errors/wrongUserDeclineFriendshipError');
+
+  /**
  * Обработчики запросов на добавление в друзья,
  * подтверждение и удаление дружбы
  */
-var User = require('./../models/user');
-var Friendship = require('./../models/friendship');
 
 /**
  * Заявка на добавление в друзья.
@@ -49,12 +53,7 @@ function request(req, res, next) {
         });
 
         newFriendship.save(function(err) {
-          return err ? next(err) : res.json({
-            _id: newFriendship._id,
-            senderId: newFriendship.senderId,
-            receiverId: newFriendship.receiverId,
-            accepted: newFriendship.accepted
-          });
+          return err ? next(err) : res.json(FriendshipPresenter.getData(newFriendship));
         });
       });
   });
@@ -67,7 +66,7 @@ function request(req, res, next) {
 function accept(req, res, next) {
   var friendshipId = req.params.friendship_id;
 
-  Friendship.findById(friendshipId, function(err, friendship) {
+  return Friendship.findById(friendshipId, function(err, friendship) {
     if (err)
       return next(err);
 
@@ -76,20 +75,23 @@ function accept(req, res, next) {
         error: { message: 'Friendship not found' }
       });
     }
-    if (friendship.receiverId != req.user.id) {
-      return res.status(403).json({
-        error: { message: 'You must be receiver to accept request' }
-      });
-    }
 
-    friendship.accepted = true;
-    friendship.save(function(err) {
-      return err ? next(err) : res.json({
-          _id: friendship._id,
-          senderId: friendship.senderId,
-          receiverId: friendship.receiverId,
-          accepted: friendship.accepted
-        });
+    return friendship.accept(req.user.id, (err) => {
+      if (err) {
+        if (err instanceof WrongUserAcceptFriendshipError) {
+          return res.status(403).json({
+            error: { message: 'User can\'t accept this request' }
+          });
+        }
+
+        return next(err);
+      }
+
+      friendship.populate('senderId', 'name lastname');
+      friendship.populate('receiverId', 'name lastname');
+      return friendship.populate((err) => {
+        return err ? next(err) : res.json(FriendshipPresenter.getData(friendship));
+      });
     });
   });
 }
@@ -101,7 +103,7 @@ function accept(req, res, next) {
 function decline(req, res, next) {
   var friendshipId = req.params.friendship_id;
 
-  Friendship.findById(friendshipId, function(err, friendship) {
+  return Friendship.findById(friendshipId, function(err, friendship) {
     if (err)
       return next(err);
 
@@ -110,15 +112,27 @@ function decline(req, res, next) {
         error: { message: 'Friendship not found' } 
       });
     }
-    if (friendship.senderId != req.user.id &&
-      friendship.receiverId != req.user.id) {
-        return res.status(403).json({
-          error: { message: 'You must be sender or receiver to decline request' }
-        });
-    }
 
-    friendship.remove(function(err) {
-      return err ? next(err) : res.status(204).send();
+    return friendship.decline(req.user.id, (err, newFriendshipData) => {
+      if (err) {
+        if (err instanceof WrongUserDeclineFriendshipError) {
+          return res.status(403).json({
+            error: { message: 'User can\'t decline this request' }
+          });
+        }
+
+        return next(err);
+      }
+
+      if (!newFriendshipData) {
+        return res.status(204).send();
+      }
+
+      newFriendshipData.populate('senderId', 'name lastname');
+      newFriendshipData.populate('receiverId', 'name lastname');
+      return newFriendshipData.populate((err) => {
+        return err ? next(err) : res.json(FriendshipPresenter.getData(newFriendshipData));
+      });
     });
   });
 }

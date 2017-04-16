@@ -1,3 +1,5 @@
+const UserPresenter = require('./presenters/userPresenter');
+
 /**
  * Обработка запроса на логин или регистрацию
  */
@@ -61,19 +63,25 @@ function loginUser(req, res, user, next, isJustRegistered) {
       return next(err);
 
     if (isJustRegistered) {
-      return res.json({ operation: RESULT_TYPE.REGISTER });
+      return res.json({
+        operation: RESULT_TYPE.REGISTER,
+        user: UserPresenter.getData(user),
+      });
     }
 
     var newName, newLastname;
-    if (req.body.name !== user.name) {
+    if (req.body.name && req.body.name !== user.name) {
       newName = req.body.name;
     }
-    if (req.body.lastname !== user.lastname) {
+    if (req.body.lastname && req.body.lastname !== user.lastname) {
       newLastname = req.body.lastname;
     }
 
     if (!newName && !newLastname) {
-      return res.json({ operation: RESULT_TYPE.LOGIN });
+      return res.json({
+        operation: RESULT_TYPE.LOGIN,
+        user: UserPresenter.getData(user),
+      });
     }
 
     if (newName) {
@@ -85,9 +93,21 @@ function loginUser(req, res, user, next, isJustRegistered) {
     }
 
     user.save(function(err) {
-      return err ? next(err) : res.json({ operation: RESULT_TYPE.LOGIN });
+      return err ? next(err) : res.json({
+        operation: RESULT_TYPE.LOGIN,
+        user: UserPresenter.getData(user),
+      });
     });
   });
+}
+
+function getUserResponseData(user) {
+  return {
+    id: user._id,
+    name: user.name,
+    lastname: user.lastname,
+    regDate: new Date(user.regDate).toLocaleDateString(),
+  }
 }
 
 module.exports = auth;
