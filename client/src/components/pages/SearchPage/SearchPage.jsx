@@ -43,7 +43,8 @@ class SearchPage extends React.PureComponent {
                   <div className="list-of-users">
                     <ul>
                       {this.props.users.map((user) => (
-                        <li><a href="/"><span>{user.name} {user.lastname}</span></a>
+                        <li key={user.id}>
+                          <a href="/"><span>{user.name} {user.lastname}</span></a>
                           <div className="control">
                             <button className="clear"><i className="fa fa-times"></i></button>
                           </div>
