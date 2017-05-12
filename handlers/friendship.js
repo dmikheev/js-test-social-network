@@ -46,9 +46,9 @@ function request(req, res, next) {
           return;
         }
 
-        var newFriendship = new Friendship({
-          senderId: senderId,
-          receiverId: receiverId,
+        const newFriendship = new Friendship({
+          senderId: req.user,
+          receiverId: user,
           accepted: false
         });
 

@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import Navigation from '../../Navigation';
 import CheckAuthorizePage from "../../common/CheckAuthorizePage";
 import { requestUsersSearch } from '../../../actions';
+import SearchUserControls from './SearchUserControls/SearchUserControlsContainer';
 
 class SearchPage extends React.PureComponent {
   constructor(){
@@ -45,9 +46,11 @@ class SearchPage extends React.PureComponent {
                       {this.props.users.map((user) => (
                         <li key={user.id}>
                           <a href="/"><span>{user.name} {user.lastname}</span></a>
-                          <div className="control">
-                            <button className="clear"><i className="fa fa-times"></i></button>
-                          </div>
+                          <SearchUserControls
+                            userFriendshipStatus={user.status}
+                            friendshipId={user.friendshipId}
+                            userId={user.id}
+                          />
                         </li>
                       ))}
                     </ul>

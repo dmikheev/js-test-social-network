@@ -159,6 +159,24 @@ export function fetchFriendsPageDataIfNeeded() {
   }
 }
 
+export const REQUEST_FRIENDSHIP_RESPONSE = 'REQUEST_FRIENDSHIP_RESPONSE';
+function requestFriendshipResponse(friendship) {
+  return {
+    type: REQUEST_FRIENDSHIP_RESPONSE,
+    data: friendship,
+  };
+}
+
+export function sendRequestFriendshipRequest(userId) {
+  return (dispatch) =>
+    fetch(`/api/friendship/request/${userId}`, {
+      credentials: 'same-origin',
+      method: 'POST',
+    })
+      .then(response => response.json())
+      .then(json => dispatch(requestFriendshipResponse(json)));
+}
+
 export const ACCEPT_FRIENDSHIP_RESPONSE = 'ACCEPT_FRIENDSHIP_RESPONSE';
 function acceptFriendshipResponse(friendship) {
   return {
@@ -178,8 +196,9 @@ export function requestAcceptFriendship(friendshipId) {
 }
 
 export const REMOVE_FRIENDSHIP_REQUEST_RESPONSE = 'REMOVE_FRIENDSHIP_REQUEST_RESPONSE';
-const removeFriendshipRequestResponse = () => ({
+const removeFriendshipRequestResponse = (friendshipId) => ({
   type: REMOVE_FRIENDSHIP_REQUEST_RESPONSE,
+  data: { id: friendshipId },
 });
 
 export function requestRemoveFriendshipRequest(friendshipId) {
@@ -190,7 +209,7 @@ export function requestRemoveFriendshipRequest(friendshipId) {
     })
       .then(response =>
         response.ok ?
-          dispatch(removeFriendshipRequestResponse(json)) :
+          dispatch(removeFriendshipRequestResponse(friendshipId)) :
           Promise.reject(response));
 }
 

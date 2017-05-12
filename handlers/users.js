@@ -6,31 +6,12 @@ var _ = require('underscore');
 var User = require('./../models/user');
 var Friendship = require('./../models/friendship');
 const UserPresenter = require('./presenters/userPresenter');
+const USER_FRIENDSHIP_STATUS = require('./usersSearchFriendshipStatuses').SEARCH_USER_FRIENDSHIP_STATUSES;
 
 /**
  * Количество пользователей на страницу
  */
 var PAGE_RESULTS_COUNT = 10;
-
-/**
- * Константы, обозначающие статус пользователя
- */
-var USER_FRIENDSHIP_STATUS = {
-  /** Текущий авторизованный пользователь */
-  SELF: 0,
-
-  /** Пользователь не в друзьях и без заявок */
-  NONE: 1,
-
-  /** От пользователя получена заявка */
-  RECEIVED: 2,
-
-  /** Пользователю отправлена заявка */
-  REQUESTED: 3,
-
-  /** Пользователь в списке друзей */
-  FRIEND: 4
-};
 
 /**
  * В параметрах запроса берём строку поиска и номер страницы.
@@ -108,7 +89,7 @@ function setUserFriendshipStatus(candidate, mainUser, friendships) {
   });
   if (incomingFriendship) {
     candidate.status = USER_FRIENDSHIP_STATUS.RECEIVED;
-    candidate.friendshipId = incomingFriendship._id;
+    candidate.friendshipId = incomingFriendship.id;
     return;
   }
   
@@ -117,7 +98,7 @@ function setUserFriendshipStatus(candidate, mainUser, friendships) {
   });
   if (outcomingFriendship) {
     candidate.status = USER_FRIENDSHIP_STATUS.REQUESTED;
-    candidate.friendshipId = outcomingFriendship._id;
+    candidate.friendshipId = outcomingFriendship.id;
     return;
   }
 
@@ -127,7 +108,7 @@ function setUserFriendshipStatus(candidate, mainUser, friendships) {
   });
   if (friendFriendship) {
     candidate.status = USER_FRIENDSHIP_STATUS.FRIEND;
-    candidate.friendshipId = friendFriendship._id;
+    candidate.friendshipId = friendFriendship.id;
     return;
   }
 
