@@ -13,7 +13,10 @@ var routes = require('./routes');
 var passportHelper = require('./libs/passportHelper');
 var errorHandler = require('./errorHandler');
 
-mongoose.connect(config.get('db:host'), config.get('db:name'));
+mongoose.Promise = Promise;
+mongoose.connect(`mongodb://${config.get('db:host')}/${config.get('db:name')}`, {
+  useMongoClient: true,
+});
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'db connection error:'));
 db.once('open', function() {
