@@ -1,6 +1,6 @@
 var webpack = require('webpack');
 
-module.exports = (env) => {
+module.exports = (env = {}) => {
   const isProd = env.production === true;
 
   const entries = [];
