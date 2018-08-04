@@ -14,8 +14,8 @@ var passportHelper = require('./libs/passportHelper');
 var errorHandler = require('./errorHandler');
 
 mongoose.Promise = Promise;
-mongoose.connect(`mongodb://${config.get('db:host')}/${config.get('db:name')}`, {
-  useMongoClient: true,
+mongoose.connect(`mongodb://${config.get('db:host')}:${config.get('db:port')}/${config.get('db:name')}`, {
+  useNewUrlParser: true,
 });
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'db connection error:'));
