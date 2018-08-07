@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import values from 'lodash/values';
@@ -28,9 +29,9 @@ function mapDispatchToProps(dispatch, ownProps) {
 
 const SearchUserControlsContainer = connect(null, mapDispatchToProps)(SearchUserControlsComponent);
 SearchUserControlsContainer.propTypes = {
-  userFriendshipStatus: React.PropTypes.oneOf(values(SEARCH_USER_FRIENDSHIP_STATUSES)).isRequired,
-  friendshipId: React.PropTypes.string,
-  userId: React.PropTypes.string,
+  userFriendshipStatus: PropTypes.oneOf(values(SEARCH_USER_FRIENDSHIP_STATUSES)).isRequired,
+  friendshipId: PropTypes.string,
+  userId: PropTypes.string,
 };
 
 export default SearchUserControlsContainer;

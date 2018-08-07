@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import Navigation from '../../Navigation';
@@ -65,8 +66,8 @@ class SearchPage extends React.PureComponent {
   }
 }
 SearchPage.propTypes = {
-  users: React.PropTypes.array.isRequired,
-  onSearchQueryInput: React.PropTypes.func.isRequired,
+  users: PropTypes.array.isRequired,
+  onSearchQueryInput: PropTypes.func.isRequired,
 };
 
 function mapStateToProps(state) {

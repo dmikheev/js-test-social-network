@@ -1,5 +1,6 @@
+import PropTypes from 'prop-types';
 import React from 'react';
-import {withRouter, Link} from "react-router";
+import { Link, withRouter } from "react-router";
 import profilePath from "./pages/ProfilePage/profilePath";
 import friendsPath from "./pages/FriendsPage/friendsPath";
 import searchPath from "./pages/SearchPage/searchPath";
@@ -46,7 +47,7 @@ function NavigationComponent(props) {
 }
 
 NavigationComponent.propTypes = {
-  router: React.PropTypes.object.isRequired,
+  router: PropTypes.object.isRequired,
 };
 
 export default withRouter(NavigationComponent);

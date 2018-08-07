@@ -3,6 +3,7 @@ module.exports = (env = {}) => {
   const publicPath = isProd ? 'http://localhost/' : 'http://localhost:8080/';
 
   return {
+    devtool: isProd ? false : 'cheap-module-source-map',
     entry: './src/index.jsx',
     mode: isProd ? 'production' : 'development',
     module: {

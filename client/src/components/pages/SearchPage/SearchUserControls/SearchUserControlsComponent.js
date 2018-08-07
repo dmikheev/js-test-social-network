@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import values from 'lodash/values';
 import { SEARCH_USER_FRIENDSHIP_STATUSES } from '../searchUserFriendshipStatuses';
@@ -12,8 +13,8 @@ export default function SearchUserControlsComponent(props) {
   );
 }
 SearchUserControlsComponent.propTypes = {
-  userFriendshipStatus: React.PropTypes.oneOf(values(SEARCH_USER_FRIENDSHIP_STATUSES)).isRequired,
-  onButtonClick: React.PropTypes.func,
+  userFriendshipStatus: PropTypes.oneOf(values(SEARCH_USER_FRIENDSHIP_STATUSES)).isRequired,
+  onButtonClick: PropTypes.func,
 };
 
 function getSearchUserButtonByFriendshipStatus(status) {
