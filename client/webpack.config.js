@@ -3,19 +3,34 @@ module.exports = (env = {}) => {
   const publicPath = isProd ? 'http://localhost/' : 'http://localhost:8080/';
 
   return {
+    devServer: {
+      contentBase: './dist',
+      hot: true,
+      proxy: {
+        '/api/**': {
+          logLevel: 'debug',
+          secure: false,
+          target: 'http://localhost',
+        },
+      },
+    },
     devtool: isProd ? false : 'cheap-module-source-map',
     entry: './src/index.jsx',
     mode: isProd ? 'production' : 'development',
     module: {
       rules: [
         {
-          test: /\.jsx?$/,
           exclude: /node_modules/,
-          loader: 'babel-loader',
+          test: /\.[jt]sx?$/,
+          use: [
+            'babel-loader',
+            'awesome-typescript-loader',
+            'tslint-loader',
+          ],
         },
         {
-          test: /\.css$/,
           exclude: /global\.css$/,
+          test: /\.css$/,
           use: [
             'style-loader',
             {
@@ -23,36 +38,25 @@ module.exports = (env = {}) => {
               options: {
                 importLoaders: 1,
                 localIdentName: '[name]_[local]_[hash:base64:5]',
-                modules: true
-              }
+                modules: true,
+              },
             },
-            'postcss-loader'
-          ]
+            'postcss-loader',
+          ],
         },
         {
+          loader: 'style-loader!css-loader!postcss-loader',
           test: /global\.css$/,
-          loader: 'style-loader!css-loader!postcss-loader'
-        }
-      ]
-    },
-    resolve: {
-      extensions: ['.js', '.jsx']
+        },
+      ],
     },
     output: {
+      filename: '[name].bundle.js',
       path: __dirname + '/dist',
       publicPath,
-      filename: '[name].bundle.js'
     },
-    devServer: {
-      contentBase: './dist',
-      hot: true,
-      proxy: {
-        '/api/**': {
-          target: 'http://localhost',
-          secure: false,
-          logLevel: 'debug'
-        }
-      }
+    resolve: {
+      extensions: ['.js', '.jsx', '.ts', '.tsx'],
     },
   };
 };

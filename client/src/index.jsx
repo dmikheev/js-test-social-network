@@ -7,5 +7,5 @@ import Root from './Root';
 
 ReactDOM.render(
   <Root/>,
-  document.getElementById('app')
+  document.getElementById('app'),
 );

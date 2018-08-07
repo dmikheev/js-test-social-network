@@ -1,0 +1,11 @@
+{
+  "extends": ["tslint-config-airbnb", "tslint:recommended", "tslint-react"],
+  "jsRules": {
+    "quotemark": [true, "single", "jsx-double", "avoid-escape"],
+    "trailing-comma": [true, { "esSpecCompliant": true, "multiline": "always", "singleline": "never" }]
+  },
+  "rules": {
+    "quotemark": [true, "single", "jsx-double", "avoid-escape"],
+    "trailing-comma": [true, { "esSpecCompliant": true, "multiline": "always", "singleline": "never" }]
+  }
+}
