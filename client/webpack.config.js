@@ -15,7 +15,7 @@ module.exports = (env = {}) => {
       },
     },
     devtool: isProd ? false : 'cheap-module-source-map',
-    entry: './src/index.jsx',
+    entry: './src/index.tsx',
     mode: isProd ? 'production' : 'development',
     module: {
       rules: [
@@ -25,7 +25,12 @@ module.exports = (env = {}) => {
           use: [
             'babel-loader',
             'awesome-typescript-loader',
-            'tslint-loader',
+            {
+              loader: 'tslint-loader',
+              options: {
+                typeCheck: true,
+              },
+            },
           ],
         },
         {

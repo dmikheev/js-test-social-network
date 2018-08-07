@@ -5,7 +5,9 @@
     "trailing-comma": [true, { "esSpecCompliant": true, "multiline": "always", "singleline": "never" }]
   },
   "rules": {
+    "import-name": false,
     "quotemark": [true, "single", "jsx-double", "avoid-escape"],
+    "ter-arrow-parens": false,
     "trailing-comma": [true, { "esSpecCompliant": true, "multiline": "always", "singleline": "never" }]
   }
 }
