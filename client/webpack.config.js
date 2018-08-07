@@ -1,31 +1,16 @@
-var webpack = require('webpack');
-
 module.exports = (env = {}) => {
   const isProd = env.production === true;
-
-  const entries = [];
-  !isProd && entries.push('webpack-dev-server/client?http://localhost:8080');
-  !isProd && entries.push('webpack/hot/only-dev-server');
-  entries.push('./src/index.jsx');
-
-  const jsLoaders = [];
-  !isProd && jsLoaders.push('react-hot-loader');
-  jsLoaders.push('babel-loader');
-
   const publicPath = isProd ? 'http://localhost/' : 'http://localhost:8080/';
 
-  const plugins = [];
-  !isProd && plugins.push(new webpack.HotModuleReplacementPlugin());
-
   return {
-    entry: entries,
+    entry: './src/index.jsx',
     mode: isProd ? 'production' : 'development',
     module: {
       rules: [
         {
           test: /\.jsx?$/,
           exclude: /node_modules/,
-          use: jsLoaders,
+          loader: 'babel-loader',
         },
         {
           test: /\.css$/,
@@ -55,7 +40,7 @@ module.exports = (env = {}) => {
     output: {
       path: __dirname + '/dist',
       publicPath,
-      filename: 'bundle.js'
+      filename: '[name].bundle.js'
     },
     devServer: {
       contentBase: './dist',
@@ -68,6 +53,5 @@ module.exports = (env = {}) => {
         }
       }
     },
-    plugins,
   };
 };

@@ -1,10 +1,18 @@
 {
   "presets": [
     ["env", {
+      "modules": false,
       "targets": {
         "browsers": ["> 0.3%"]
       }
     }],
     "react"
-  ]
+  ],
+  "env": {
+    "development": {
+      "plugins": [
+        "react-hot-loader/babel"
+      ]
+    }
+  }
 }
