@@ -1,3 +1,3 @@
 export default '/profile';
 
-export const routerPath = '/profile(/:userId)';
+export const routerPath = '/profile/:userId?';

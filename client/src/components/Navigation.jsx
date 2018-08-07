@@ -1,11 +1,10 @@
-import PropTypes from 'prop-types';
 import React from 'react';
-import { Link, withRouter } from "react-router";
+import { NavLink } from "react-router-dom";
 import profilePath from "./pages/ProfilePage/profilePath";
 import friendsPath from "./pages/FriendsPage/friendsPath";
 import searchPath from "./pages/SearchPage/searchPath";
 
-function NavigationComponent(props) {
+function Navigation() {
   const navItems = [
     {
       href: profilePath,
@@ -28,17 +27,16 @@ function NavigationComponent(props) {
     <div className="navigation">
       <ul>
         {
-          navItems.map((item, idx) => (
-            <Link
+          navItems.map((item) => (
+            <NavLink
               key={item.href}
               to={item.href}
               className="button rectangular"
               activeClassName="active"
-              onlyActiveOnIndex={false}
             >
               <i className={`fa ${item.iconClass}`} />
               {item.caption}
-            </Link>
+            </NavLink>
           ))
         }
       </ul>
@@ -46,8 +44,4 @@ function NavigationComponent(props) {
   );
 }
 
-NavigationComponent.propTypes = {
-  router: PropTypes.object.isRequired,
-};
-
-export default withRouter(NavigationComponent);
+export default Navigation;

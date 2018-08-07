@@ -1,3 +1,4 @@
-:global(.app-root), .page {
+:global(.app-root),
+.page {
   height: 100%;
 }
