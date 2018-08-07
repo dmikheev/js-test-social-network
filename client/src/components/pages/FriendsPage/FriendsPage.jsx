@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import Navigation from '../../Navigation';
-import CheckAuthorizePage from "../../common/CheckAuthorizePage";
+import CheckAuthorizePage from '../../common/CheckAuthorizePage';
 import * as Actions from '../../../actions';
 
 class FriendsPage extends React.PureComponent {
@@ -102,15 +102,15 @@ class FriendsPage extends React.PureComponent {
   }
 }
 FriendsPage.propTypes = {
+  currentUserId: PropTypes.string.isRequired,
   didInvalidate: PropTypes.bool.isRequired,
+  friends: PropTypes.array.isRequired,
   inbox: PropTypes.array.isRequired,
   outbox: PropTypes.array.isRequired,
-  friends: PropTypes.array.isRequired,
-  currentUserId: PropTypes.string.isRequired,
 
   onDataInvalidate: PropTypes.func.isRequired,
-  onFriendshipRequestAcceptClick: PropTypes.func.isRequired,
   onFriendshipRemoveClick: PropTypes.func.isRequired,
+  onFriendshipRequestAcceptClick: PropTypes.func.isRequired,
 };
 
 function mapStateToProps(state) {
@@ -119,9 +119,9 @@ function mapStateToProps(state) {
   return {
     currentUserId: state.getIn(['authorization', 'userId']),
     didInvalidate: friendsPageState.didInvalidate,
+    friends: friendsPageState.friends,
     inbox: friendsPageState.inbox,
     outbox: friendsPageState.outbox,
-    friends: friendsPageState.friends,
   };
 }
 

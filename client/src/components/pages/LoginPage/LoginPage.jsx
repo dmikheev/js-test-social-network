@@ -1,17 +1,17 @@
 import React from 'react';
 import CheckAuthorizePage from '../../common/CheckAuthorizePage';
-import {connect} from 'react-redux';
-import {sendAuthorizationRequest} from '../../../actions';
+import { connect } from 'react-redux';
+import { sendAuthorizationRequest } from '../../../actions';
 
 class LoginPage extends React.PureComponent {
   constructor(...args) {
     super(...args);
 
     this.state = {
-      login: '',
-      pass: '',
-      name: '',
       lastname: '',
+      login: '',
+      name: '',
+      pass: '',
     };
 
     this.onInput = this.onInput.bind(this);
@@ -42,16 +42,28 @@ class LoginPage extends React.PureComponent {
           <div>
             <div className="substrate">
               <div className="textbox">
-                <input id="name" type="text" placeholder="Name" onInput={this.onInput} onKeyDown={this.onKeyDown} />
+                <input id="name" type="text" placeholder="Name" onInput={this.onInput} onKeyDown={this.onKeyDown}/>
               </div>
               <div className="textbox">
-                <input id="lastname" type="text" placeholder="Last name" onInput={this.onInput} onKeyDown={this.onKeyDown} />
+                <input
+                  id="lastname"
+                  type="text"
+                  placeholder="Last name"
+                  onInput={this.onInput}
+                  onKeyDown={this.onKeyDown}
+                />
               </div>
-              <div className="textbox icon"><i className="fa fa-user"></i>
-                <input id="login" type="text" placeholder="Login" onInput={this.onInput} onKeyDown={this.onKeyDown} />
+              <div className="textbox icon"><i className="fa fa-user"/>
+                <input id="login" type="text" placeholder="Login" onInput={this.onInput} onKeyDown={this.onKeyDown}/>
               </div>
-              <div className="textbox icon"><i className="fa fa-lock"></i>
-                <input id="pass" type="password" placeholder="Password" onInput={this.onInput} onKeyDown={this.onKeyDown} />
+              <div className="textbox icon"><i className="fa fa-lock"/>
+                <input
+                  id="pass"
+                  type="password"
+                  placeholder="Password"
+                  onInput={this.onInput}
+                  onKeyDown={this.onKeyDown}
+                />
               </div>
               <button id="button" className="rectangular green" onClick={this.onFormSubmit}>
                 <i className="fa fa-sign-in" />

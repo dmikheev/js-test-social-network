@@ -6,7 +6,6 @@ import { SEARCH_USER_FRIENDSHIP_STATUSES } from '../searchUserFriendshipStatuses
 import SearchUserControlsComponent from './SearchUserControlsComponent';
 import * as Actions from '../../../../actions';
 
-
 function mapDispatchToProps(dispatch, ownProps) {
   return {
     onButtonClick() {
@@ -29,8 +28,8 @@ function mapDispatchToProps(dispatch, ownProps) {
 
 const SearchUserControlsContainer = connect(null, mapDispatchToProps)(SearchUserControlsComponent);
 SearchUserControlsContainer.propTypes = {
-  userFriendshipStatus: PropTypes.oneOf(values(SEARCH_USER_FRIENDSHIP_STATUSES)).isRequired,
   friendshipId: PropTypes.string,
+  userFriendshipStatus: PropTypes.oneOf(values(SEARCH_USER_FRIENDSHIP_STATUSES)).isRequired,
   userId: PropTypes.string,
 };
 

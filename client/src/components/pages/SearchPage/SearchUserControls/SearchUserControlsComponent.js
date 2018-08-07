@@ -13,8 +13,8 @@ export default function SearchUserControlsComponent(props) {
   );
 }
 SearchUserControlsComponent.propTypes = {
-  userFriendshipStatus: PropTypes.oneOf(values(SEARCH_USER_FRIENDSHIP_STATUSES)).isRequired,
   onButtonClick: PropTypes.func,
+  userFriendshipStatus: PropTypes.oneOf(values(SEARCH_USER_FRIENDSHIP_STATUSES)).isRequired,
 };
 
 function getSearchUserButtonByFriendshipStatus(status) {
@@ -33,6 +33,5 @@ function getSearchUserButtonByFriendshipStatus(status) {
       return <i className="fa fa-times" />;
   }
 
-  console.error('Unknown friendship status in SearchUserControlsComponent::getSearchUserButtonByFriendshipStatus!');
-  return null;
+  throw new Error('Unknown friendship status in SearchUserControlsComponent::getSearchUserButtonByFriendshipStatus!');
 }

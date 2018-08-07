@@ -7,10 +7,10 @@ import LoginPage from './components/pages/LoginPage/LoginPage';
 import ProfilePage from './components/pages/ProfilePage/ProfilePage';
 import FriendsPage from './components/pages/FriendsPage/FriendsPage';
 import SearchPage from './components/pages/SearchPage/SearchPage';
-import loginPath from "./components/pages/LoginPage/loginPath";
-import friendsPath from "./components/pages/FriendsPage/friendsPath";
+import loginPath from './components/pages/LoginPage/loginPath';
+import friendsPath from './components/pages/FriendsPage/friendsPath';
 import profilePath, { routerPath as profilePathWithParam } from './components/pages/ProfilePage/profilePath';
-import searchPath from "./components/pages/SearchPage/searchPath";
+import searchPath from './components/pages/SearchPage/searchPath';
 import store from './store';
 
 import './root.css';

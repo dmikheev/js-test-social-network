@@ -1,25 +1,25 @@
 import React from 'react';
-import { NavLink } from "react-router-dom";
-import profilePath from "./pages/ProfilePage/profilePath";
-import friendsPath from "./pages/FriendsPage/friendsPath";
-import searchPath from "./pages/SearchPage/searchPath";
+import { NavLink } from 'react-router-dom';
+import profilePath from './pages/ProfilePage/profilePath';
+import friendsPath from './pages/FriendsPage/friendsPath';
+import searchPath from './pages/SearchPage/searchPath';
 
 function Navigation() {
   const navItems = [
     {
+      caption: 'Profile',
       href: profilePath,
       iconClass: 'fa-user',
-      caption: 'Profile',
     },
     {
+      caption: 'Friends',
       href: friendsPath,
       iconClass: 'fa-users',
-      caption: 'Friends',
     },
     {
+      caption: 'Search',
       href: searchPath,
       iconClass: 'fa-search',
-      caption: 'Search',
     },
   ];
 

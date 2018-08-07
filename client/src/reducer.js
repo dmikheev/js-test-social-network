@@ -14,8 +14,8 @@ export default function(state, action) {
 
     case ACTIONS.HANDLE_AUTHORIZATION_CHECK_RESPONSE: {
       return state.mergeIn(['authorization'], {
-        isFetching: false,
         didInvalidate: false,
+        isFetching: false,
         isUserAuthorized: action.data.isUserAuthorized,
         userId: action.data.user && action.data.user.id,
       });
@@ -27,8 +27,8 @@ export default function(state, action) {
       }
 
       return state.mergeIn(['authorization'], {
-        isFetching: false,
         didInvalidate: false,
+        isFetching: false,
         isUserAuthorized: true,
         userId: action.data.user.id,
       });
@@ -40,9 +40,9 @@ export default function(state, action) {
 
     case ACTIONS.REQUEST_PROFILE_PAGE_DATA_RESPONSE: {
       return state.mergeIn(['profilePage'], {
-        isFetching: false,
         didInvalidate: false,
         firstName: action.data.user.name,
+        isFetching: false,
         lastName: action.data.user.lastname,
         regDate: action.data.user.regDate,
       });
@@ -54,11 +54,11 @@ export default function(state, action) {
 
     case ACTIONS.REQUEST_FRIENDS_PAGE_DATA_RESPONSE: {
       return state.mergeIn(['friendsPage'], {
-        isFetching: false,
         didInvalidate: false,
-        inbox: action.data.friendships.incoming,
-        outbox: action.data.friendships.outcoming,
         friends: action.data.friendships.friends,
+        inbox: action.data.friendships.incoming,
+        isFetching: false,
+        outbox: action.data.friendships.outcoming,
       });
     }
 
@@ -73,7 +73,7 @@ export default function(state, action) {
 
       return newState.setIn(
         ['searchPage', 'users', changingUserIdx, 'status'],
-        SEARCH_USER_FRIENDSHIP_STATUSES.REQUESTED
+        SEARCH_USER_FRIENDSHIP_STATUSES.REQUESTED,
       );
     }
 
@@ -91,7 +91,7 @@ export default function(state, action) {
         newState = newState
           .setIn(
             ['searchPage', 'users', changingUserIdx, 'status'],
-            SEARCH_USER_FRIENDSHIP_STATUSES.FRIEND
+            SEARCH_USER_FRIENDSHIP_STATUSES.FRIEND,
           );
       }
 
@@ -111,7 +111,7 @@ export default function(state, action) {
         newState = newState
           .setIn(
             ['searchPage', 'users', changingUserIdx, 'status'],
-            SEARCH_USER_FRIENDSHIP_STATUSES.NONE
+            SEARCH_USER_FRIENDSHIP_STATUSES.NONE,
           )
           .deleteIn(['searchPage', 'users', changingUserIdx, 'friendshipId']);
       }
@@ -133,7 +133,7 @@ export default function(state, action) {
         newState = newState
           .setIn(
             ['searchPage', 'users', changingUserIdx, 'status'],
-            SEARCH_USER_FRIENDSHIP_STATUSES.RECEIVED
+            SEARCH_USER_FRIENDSHIP_STATUSES.RECEIVED,
           )
           .setIn(['searchPage', 'users', changingUserIdx, 'friendshipId'], action.data.id);
       }
@@ -152,25 +152,25 @@ export default function(state, action) {
 function getDefaultState() {
   return fromJS({
     authorization: {
-      isFetching: false,
       didInvalidate: true,
+      isFetching: false,
       isUserAuthorized: null,
       userId: null,
     },
-    profilePage: {
-      isFetching: false,
-      didInvalidate: true,
-      firstName: '',
-      lastName: '',
-      regDate: '',
-    },
     // TODO: refactor (normalize)
     friendsPage: {
-      isFetching: false,
       didInvalidate: true,
-      inbox: [],
-      outbox: [],
       friends: [],
+      inbox: [],
+      isFetching: false,
+      outbox: [],
+    },
+    profilePage: {
+      didInvalidate: true,
+      firstName: '',
+      isFetching: false,
+      lastName: '',
+      regDate: '',
     },
     searchPage: {
       users: [

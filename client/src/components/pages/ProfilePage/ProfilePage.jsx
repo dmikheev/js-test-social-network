@@ -1,6 +1,6 @@
 import React from 'react';
 import Navigation from '../../Navigation';
-import CheckAuthorizePage from "../../common/CheckAuthorizePage";
+import CheckAuthorizePage from '../../common/CheckAuthorizePage';
 import {connect} from 'react-redux';
 import {fetchProfilePageDataIfNeeded} from '../../../actions';
 
@@ -44,7 +44,7 @@ function mapDispatchToProps(dispatch) {
   return {
     onDataInvalidate() {
       dispatch(fetchProfilePageDataIfNeeded());
-    }
+    },
   };
 }
 

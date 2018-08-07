@@ -15,5 +15,5 @@ export const SEARCH_USER_FRIENDSHIP_STATUSES = {
   REQUESTED: 3,
 
   /** Пользователь в списке друзей */
-  FRIEND: 4
+  FRIEND: 4,
 };

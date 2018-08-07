@@ -2,12 +2,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import Navigation from '../../Navigation';
-import CheckAuthorizePage from "../../common/CheckAuthorizePage";
+import CheckAuthorizePage from '../../common/CheckAuthorizePage';
 import { requestUsersSearch } from '../../../actions';
 import SearchUserControls from './SearchUserControls/SearchUserControlsContainer';
 
 class SearchPage extends React.PureComponent {
-  constructor(){
+  constructor() {
     super(...arguments);
 
     this.state = {
@@ -35,7 +35,7 @@ class SearchPage extends React.PureComponent {
             <div className="grid-container">
               <div className="grid-column col-60">
                 <div className="substrate">
-                  <div className="textbox icon"><i className="fa fa-search"></i>
+                  <div className="textbox icon"><i className="fa fa-search"/>
                     <input
                       type="text"
                       placeholder="Enter your user name ..."
@@ -66,8 +66,8 @@ class SearchPage extends React.PureComponent {
   }
 }
 SearchPage.propTypes = {
-  users: PropTypes.array.isRequired,
   onSearchQueryInput: PropTypes.func.isRequired,
+  users: PropTypes.array.isRequired,
 };
 
 function mapStateToProps(state) {

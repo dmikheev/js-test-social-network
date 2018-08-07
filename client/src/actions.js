@@ -2,14 +2,14 @@ export const REQUEST_AUTHORIZATION_CHECK = 'REQUEST_AUTHORIZATION_CHECK';
 function requestAuthorizationCheck() {
   return {
     type: REQUEST_AUTHORIZATION_CHECK,
-  }
+  };
 }
 
 export const HANDLE_AUTHORIZATION_CHECK_RESPONSE = 'HANDLE_AUTHORIZATION_CHECK_RESPONSE';
 function handleAuthorizationCheckResponse(isUserAuthorized, user) {
   return {
-    type: HANDLE_AUTHORIZATION_CHECK_RESPONSE,
     data: { isUserAuthorized, user },
+    type: HANDLE_AUTHORIZATION_CHECK_RESPONSE,
   };
 }
 
@@ -50,25 +50,25 @@ function checkAuthorization() {
 export const HANDLE_AUTHORIZATION_RESPONSE = 'HANDLE_AUTHORIZATION_RESPONSE';
 function handleAuthorizationResponse(data) {
   return {
-    type: HANDLE_AUTHORIZATION_RESPONSE,
     data,
+    type: HANDLE_AUTHORIZATION_RESPONSE,
   };
 }
 
 export function sendAuthorizationRequest(login, pass, firstName, lastName) {
   return (dispatch) => {
     return fetch('/api/auth', {
-      method: 'POST',
+      body: JSON.stringify({
+        lastname: lastName,
+        login,
+        name: firstName,
+        pass,
+      }),
       credentials: 'same-origin',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        login,
-        pass,
-        name: firstName,
-        lastname: lastName,
-      }),
+      method: 'POST',
     })
       .then(response => (response.ok ? response.json() : null))
       .then(json => dispatch(handleAuthorizationResponse(json)));
@@ -79,15 +79,15 @@ export const REQUEST_PROFILE_PAGE_DATA = 'REQUEST_PROFILE_PAGE_DATA';
 function requestProfilePageData() {
   return {
     type: REQUEST_PROFILE_PAGE_DATA,
-  }
+  };
 }
 
 export const REQUEST_PROFILE_PAGE_DATA_RESPONSE = 'REQUEST_PROFILE_PAGE_DATA_RESPONSE';
 function requestProfilePageDataResponse(user) {
   return {
-    type: REQUEST_PROFILE_PAGE_DATA_RESPONSE,
     data: { user },
-  }
+    type: REQUEST_PROFILE_PAGE_DATA_RESPONSE,
+  };
 }
 
 function fetchProfilePageData() {
@@ -98,7 +98,7 @@ function fetchProfilePageData() {
     })
       .then(response => response.json())
       .then(json => dispatch(requestProfilePageDataResponse(json)));
-  }
+  };
 }
 function shouldFetchProfilePageData(state) {
   if (state.getIn(['profilePage', 'isFetching'])) {
@@ -110,26 +110,26 @@ function shouldFetchProfilePageData(state) {
 export function fetchProfilePageDataIfNeeded() {
   return (dispatch, getState) => {
     if (shouldFetchProfilePageData(getState())) {
-      return dispatch(fetchProfilePageData())
+      return dispatch(fetchProfilePageData());
     } else {
-      return Promise.resolve()
+      return Promise.resolve();
     }
-  }
+  };
 }
 
 export const REQUEST_FRIENDS_PAGE_DATA = 'REQUEST_FRIENDS_PAGE_DATA';
 function requestFriendsPageData() {
   return {
     type: REQUEST_FRIENDS_PAGE_DATA,
-  }
+  };
 }
 
 export const REQUEST_FRIENDS_PAGE_DATA_RESPONSE = 'REQUEST_FRIENDS_PAGE_DATA_RESPONSE';
 function requestFriendsPageDataResponse(friendships) {
   return {
-    type: REQUEST_FRIENDS_PAGE_DATA_RESPONSE,
     data: { friendships },
-  }
+    type: REQUEST_FRIENDS_PAGE_DATA_RESPONSE,
+  };
 }
 
 function fetchFriendsPageData() {
@@ -140,7 +140,7 @@ function fetchFriendsPageData() {
     })
       .then(response => response.json())
       .then(json => dispatch(requestFriendsPageDataResponse(json)));
-  }
+  };
 }
 function shouldFetchFriendsPageData(state) {
   if (state.getIn(['friendsPage', 'isFetching'])) {
@@ -152,18 +152,18 @@ function shouldFetchFriendsPageData(state) {
 export function fetchFriendsPageDataIfNeeded() {
   return (dispatch, getState) => {
     if (shouldFetchFriendsPageData(getState())) {
-      return dispatch(fetchFriendsPageData())
+      return dispatch(fetchFriendsPageData());
     } else {
-      return Promise.resolve()
+      return Promise.resolve();
     }
-  }
+  };
 }
 
 export const REQUEST_FRIENDSHIP_RESPONSE = 'REQUEST_FRIENDSHIP_RESPONSE';
 function requestFriendshipResponse(friendship) {
   return {
-    type: REQUEST_FRIENDSHIP_RESPONSE,
     data: friendship,
+    type: REQUEST_FRIENDSHIP_RESPONSE,
   };
 }
 
@@ -180,9 +180,9 @@ export function sendRequestFriendshipRequest(userId) {
 export const ACCEPT_FRIENDSHIP_RESPONSE = 'ACCEPT_FRIENDSHIP_RESPONSE';
 function acceptFriendshipResponse(friendship) {
   return {
-    type: ACCEPT_FRIENDSHIP_RESPONSE,
     data: friendship,
-  }
+    type: ACCEPT_FRIENDSHIP_RESPONSE,
+  };
 }
 
 export function requestAcceptFriendship(friendshipId) {
@@ -197,8 +197,8 @@ export function requestAcceptFriendship(friendshipId) {
 
 export const REMOVE_FRIENDSHIP_REQUEST_RESPONSE = 'REMOVE_FRIENDSHIP_REQUEST_RESPONSE';
 const removeFriendshipRequestResponse = (friendshipId) => ({
-  type: REMOVE_FRIENDSHIP_REQUEST_RESPONSE,
   data: { id: friendshipId },
+  type: REMOVE_FRIENDSHIP_REQUEST_RESPONSE,
 });
 
 export function requestRemoveFriendshipRequest(friendshipId) {
@@ -216,9 +216,9 @@ export function requestRemoveFriendshipRequest(friendshipId) {
 export const REMOVE_FRIENDSHIP_RESPONSE = 'REMOVE_FRIENDSHIP_RESPONSE';
 function removeFriendshipResponse(newFriendshipData) {
   return {
-    type: REMOVE_FRIENDSHIP_RESPONSE,
     data: newFriendshipData,
-  }
+    type: REMOVE_FRIENDSHIP_RESPONSE,
+  };
 }
 
 export function requestRemoveFriendship(friendshipId) {
@@ -233,8 +233,8 @@ export function requestRemoveFriendship(friendshipId) {
 
 export const UPDATE_SEARCH_USERS = 'UPDATE_SEARCH_USERS';
 const updateSearchUsers = (users) => ({
-  type: UPDATE_SEARCH_USERS,
   data: users,
+  type: UPDATE_SEARCH_USERS,
 });
 
 export function requestUsersSearch(searchQuery) {
