@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router';
-import loginPath from "../pages/LoginPage/loginPath";
-import profilePath from "../pages/ProfilePage/profilePath";
-import {checkAuthorizationIfNeeded} from "../../actions";
+import { Redirect } from 'react-router-dom';
+import loginPath from '../pages/LoginPage/loginPath';
+import profilePath from '../pages/ProfilePage/profilePath';
+import { checkAuthorizationIfNeeded } from '../../actions';
 
 const REDIRECT_UNAUTH_PATH = loginPath;
 const REDIRECT_AUTH_PATH = profilePath;
@@ -29,20 +29,15 @@ export default (isPageForAuthUsers) => (WrappedComponent) => {
         );
       }
 
-      return null;
+      return isPageForAuthUsers ?
+        <Redirect to={REDIRECT_UNAUTH_PATH}/> :
+        <Redirect to={REDIRECT_AUTH_PATH}/>;
     }
 
     checkAuth() {
       if (!this.props.isAuthChecked) {
         this.props.checkAuthorization();
-        return;
       }
-
-      if (this.props.isUserAuthorized === isPageForAuthUsers) {
-        return;
-      }
-
-      this.props.router.push(isPageForAuthUsers ? REDIRECT_UNAUTH_PATH : REDIRECT_AUTH_PATH);
     }
   }
 
@@ -61,5 +56,5 @@ export default (isPageForAuthUsers) => (WrappedComponent) => {
     };
   }
 
-  return connect(mapStateToProps, mapDispatchToProps)(withRouter(CheckAuthorizePageComponent));
+  return connect(mapStateToProps, mapDispatchToProps)(CheckAuthorizePageComponent);
 };
