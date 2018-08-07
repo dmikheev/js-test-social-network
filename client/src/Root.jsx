@@ -2,6 +2,7 @@ import React from 'react';
 import { hot } from 'react-hot-loader';
 import { Redirect, Route, HashRouter, Switch } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import App from './components/App';
 import LoginPage from './components/pages/LoginPage/LoginPage';
 import ProfilePage from './components/pages/ProfilePage/ProfilePage';
 import FriendsPage from './components/pages/FriendsPage/FriendsPage';
@@ -12,13 +13,13 @@ import profilePath, { routerPath as profilePathWithParam } from './components/pa
 import searchPath from "./components/pages/SearchPage/searchPath";
 import store from './store';
 
-import styles from './root.css';
+import './root.css';
 
 function Root() {
   return (
     <Provider store={store}>
       <HashRouter>
-        <div id="page" className={styles.page}>
+        <App>
           <Switch>
             <Route path={loginPath} component={LoginPage} />
             <Route path={profilePathWithParam} component={ProfilePage} />
@@ -26,7 +27,7 @@ function Root() {
             <Route path={searchPath} component={SearchPage} />
             <Redirect path="*" to={profilePath} />
           </Switch>
-        </div>
+        </App>
       </HashRouter>
     </Provider>
   );
