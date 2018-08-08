@@ -1,0 +1,291 @@
+openapi: 3.0.1
+info:
+  title: Friends API
+  version: 1.0.0
+servers:
+- url: '/api'
+paths:
+  /auth:
+    post:
+      parameters:
+      - in: body
+        name: body
+        required: true
+      responses:
+        '200':
+          description: Successful login or register
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAuthResponse"
+        '401':
+          description: User found, wrong password
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /user/get/{userId}:
+    get:
+      parameters:
+      - name: userId
+        in: path
+        type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '401':
+          $ref: "#/components/responses/AuthRequired"
+        '404':
+          $ref: "#/components/responses/NotFound"
+
+  /users/find/{searchQuery}/{page}:
+    get:
+      parameters:
+      - name: searchQuery
+        in: path
+        type: string
+      - name: page
+        in: path
+        type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsersFindResponse"
+        '401':
+          $ref: "#/components/responses/AuthRequired"
+
+  /friendships/getAll:
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FriendshipsGetAllResponse"
+        '401':
+          $ref: "#/components/responses/AuthRequired"
+
+  /friendship/request/{userId}:
+    post:
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Friendship"
+        '400':
+          description: Invalid user ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '401':
+          $ref: "#/components/responses/AuthRequired"
+        '404':
+          $ref: "#/components/responses/NotFound"
+
+  /friendship/accept/{friendshipId}:
+    post:
+      parameters:
+      - name: friendshipId
+        in: path
+        required: true
+        type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Friendship"
+        '400':
+          description: Invalid friendship ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '401':
+          $ref: "#/components/responses/AuthRequired"
+        '404':
+          $ref: "#/components/responses/NotFound"
+
+  /friendship/decline/{friendshipId}:
+    post:
+    parameters:
+    - name: friendshipId
+      in: path
+      required: true
+      type: string
+    responses:
+      '200':
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FriendshipDeclineResponse"
+      '400':
+        description: Invalid friendship ID
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Error"
+      '401':
+        $ref: "#/components/responses/AuthRequired"
+      '404':
+        $ref: "#/components/responses/NotFound"
+
+components:
+  responses:
+    AuthRequired:
+      description: Auth required
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Auth required
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+  schemas:
+    User:
+      type: object
+      required:
+      - id
+      - lastname
+      - name
+      - regDate
+      properties:
+        id:
+          type: string
+        lastname:
+          type: string
+        name:
+          type: string
+        regDate:
+          types: string
+
+    Friendship:
+      type: object
+      required:
+      - isAccepted
+      - receiverId
+      - senderId
+      properties:
+        isAccepted:
+          type: boolean
+        receiverId:
+          type: string
+        senderId:
+          type: string
+
+    UserAuthInput:
+      type: object
+      required:
+      - login
+      - pass
+      properties:
+        lastname:
+          type: string
+        login:
+          type: string
+        name:
+          type: string
+        pass:
+          type: string
+
+    UserAuthResponse:
+      type: object
+      required:
+      - operation
+      - user
+      properties:
+        operation:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+
+    UsersFindResponse:
+      type: object
+      required:
+      - foundUserIds
+      - itemsPerPage
+      - totalItemsCount
+      - entities
+      properties:
+        foundUserIds:
+          type: array
+          items:
+            type: string
+        itemsPerPage:
+          type: integer
+        totalItemsCount:
+          type: integer
+        entities:
+          type: object
+          required:
+          - friendships
+          - users
+          properties:
+            friendships:
+              type: array
+              items:
+                $ref: "#/components/schemas/Friendship"
+            users:
+              type: array
+              items:
+                $ref: "#/components/schemas/User"
+
+    FriendshipsGetAllResponse:
+      type: object
+      required:
+      - entities
+      properties:
+        entities:
+          type: object
+          required:
+          - friendships
+          - users
+          properties:
+            friendships:
+              type: array
+              items:
+                $ref: "#/components/schemas/Friendship"
+            users:
+              type: array
+              items:
+                $ref: "#/components/schemas/User"
+
+    FriendshipDeclineResponse:
+      type: object
+      required:
+      - isDeleted
+      properties:
+        isDeleted:
+          type: boolean
+        friendship:
+          $ref: "#/components/schemas/Friendship"
+
+    Error:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - message
+          properties:
+            message:
+              type: string
