@@ -15,7 +15,7 @@ module.exports.setup = function(app, handlers, ensureAuth) {
   app.get('/api/users/find//:page', handlers.users.find);
 
   app.get('/api/friendships/getAll', handlers.friendships.getAll);
-  
+
   app.post('/api/friendship/request/:user_id', handlers.friendship.request);
   app.post('/api/friendship/accept/:friendship_id', handlers.friendship.accept);
   app.post('/api/friendship/decline/:friendship_id', handlers.friendship.decline);

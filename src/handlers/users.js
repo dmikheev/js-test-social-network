@@ -1,17 +1,17 @@
 /**
  * Обработчик запроса на поиск пользователей
  */
-var _ = require('underscore');
+const _ = require('underscore');
 
-var User = require('./../models/user');
-var Friendship = require('./../models/friendship');
+const User = require('../models/user');
+const Friendship = require('../models/friendship');
 const UserPresenter = require('./presenters/userPresenter');
 const USER_FRIENDSHIP_STATUS = require('./usersSearchFriendshipStatuses').SEARCH_USER_FRIENDSHIP_STATUSES;
 
 /**
  * Количество пользователей на страницу
  */
-var PAGE_RESULTS_COUNT = 10;
+const PAGE_RESULTS_COUNT = 10;
 
 /**
  * В параметрах запроса берём строку поиска и номер страницы.
@@ -19,55 +19,57 @@ var PAGE_RESULTS_COUNT = 10;
  * В объект каждого пользователя добавляем его статус и id дружбы (если есть).
  */
 function find(req, res, next) {
-  var searchString = req.params.search_query || '';
-  var pageNum = req.params.page || 0;
-  var query;
+  const searchString = req.params.search_query || '';
+  const pageNum = req.params.page || 0;
+  let query;
 
   if (searchString) {
     query = User
       .find(
         { $text: { $search: searchString } },
         {
-          name: true,
           lastname: true,
-          score: { $meta: 'textScore' }
-        }
+          name: true,
+          score: { $meta: 'textScore' },
+        },
       )
       .sort({ score: { $meta: 'textScore' } });
   } else {
     query = User.find({}, 'name lastname');
   }
-  
+
   query
     .skip(pageNum * PAGE_RESULTS_COUNT)
     .limit(PAGE_RESULTS_COUNT)
     .lean()
-    .exec(function(err, users) {
-      if (err)
-        return next(err);
+    .exec(function(findErr, users) {
+      if (findErr) {
+        return next(findErr);
+      }
 
       Friendship.getItemsForUser(
         req.user._id,
         true,
-        function(err, friendships) {
-          if (err)
-            return next(err);
+        function(getItemsErr, friendships) {
+          if (getItemsErr) {
+            return next(getItemsErr);
+          }
 
-          for (var i = users.length - 1; i >= 0; i--) {
+          for (let i = users.length - 1; i >= 0; i--) {
             setUserFriendshipStatus(users[i], req.user, friendships);
-          };
+          }
 
           return res.json(users.map((user) => UserPresenter.getData(user, {
-            status: user.status,
             friendshipId: user.friendshipId,
+            status: user.status,
           })));
-        }
+        },
       );
     });
 }
 
 module.exports = {
-  find: find
+  find: find,
 };
 
 /**
@@ -78,7 +80,7 @@ module.exports = {
  * @param friendships - объект содержащий списки дружбы из models/friendship.getItemsForUser
  */
 function setUserFriendshipStatus(candidate, mainUser, friendships) {
-  if (candidate._id == mainUser.id) {
+  if (candidate._id === mainUser.id) {
     candidate.status = USER_FRIENDSHIP_STATUS.SELF;
     return;
   }
@@ -92,7 +94,7 @@ function setUserFriendshipStatus(candidate, mainUser, friendships) {
     candidate.friendshipId = incomingFriendship.id;
     return;
   }
-  
+
   const outcomingFriendship = _.find(friendships.outcoming, function(friendship) {
     return friendship.receiver.id.id === candidateId.id;
   });

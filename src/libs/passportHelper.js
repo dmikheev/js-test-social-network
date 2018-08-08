@@ -2,10 +2,10 @@
  * Настройка библиотеки passport
  */
 
-var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
 
-var User = require('./../models/user');
+const User = require('./../models/user');
 
 function init() {
   /** В cookie храним id пользователя */
@@ -27,31 +27,34 @@ function init() {
    *  - {String} message - сообщение об ошибке
    */
   passport.use(new LocalStrategy({
-      usernameField: 'login',
-      passwordField: 'pass'
-    }, function(login, pass, done) {
-      User.findOne({ login: login }, function(err, user) {
-        if (err)
-          return done(err);
+    passwordField: 'pass',
+    usernameField: 'login',
+  }, function(login, pass, done) {
+    User.findOne({ login: login }, function(findErr, user) {
+      if (findErr) {
+        return done(findErr);
+      }
 
-        if (!user)
-          return done(null, false, { userFound: false });
+      if (!user) {
+        return done(null, false, { userFound: false });
+      }
 
-        user.comparePass(pass, function(err, isMatch) {
-          if (err)
-            return done(err);
+      user.comparePass(pass, function(passErr, isMatch) {
+        if (passErr) {
+          return done(passErr);
+        }
 
-          if (isMatch) {
-            return done(null, user);
-          } else {
-            return done(null, false, {
-                userFound: true,
-                message: 'Invalid password'
-              });
-          }
-        });
+        if (isMatch) {
+          return done(null, user);
+        } else {
+          return done(null, false, {
+            message: 'Invalid password',
+            userFound: true,
+          });
+        }
       });
-    }));
+    });
+  }));
 }
 
 /** Middleware для проверки авторизации. При ошибке возвращаем код 401. */
@@ -64,6 +67,6 @@ function ensureAuthenticated(req, res, next) {
 }
 
 module.exports = {
+  ensureAuthenticated: ensureAuthenticated,
   init: init,
-  ensureAuthenticated: ensureAuthenticated
 };

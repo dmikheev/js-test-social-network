@@ -3,16 +3,16 @@ const UserPresenter = require('./presenters/userPresenter');
 /**
  * Обработка запроса на логин или регистрацию
  */
-var passport = require('passport');
+const passport = require('passport');
 
-var User = require('./../models/user');
+const User = require('../models/user');
 
 /**
  * Константы, обозначающие тип операции
  */
-var RESULT_TYPE = {
+const RESULT_TYPE = {
+  LOGIN: 'LOGIN',
   REGISTER: 'REGISTER',
-  LOGIN: 'LOGIN'
 };
 
 /**
@@ -20,8 +20,9 @@ var RESULT_TYPE = {
  */
 function auth(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
-    if (err)
+    if (err) {
       return next(err);
+    }
 
     if (!user) {
       if (info.userFound) {
@@ -39,12 +40,12 @@ function auth(req, res, next) {
  * Регистрируем пользователя
  */
 function registerUser(req, res, next) {
-  var user = new User({
-    name: req.body.name,
+  const user = new User({
     lastname: req.body.lastname,
-    regDate: new Date(),
     login: req.body.login,
-    pass: req.body.pass
+    name: req.body.name,
+    pass: req.body.pass,
+    regDate: new Date(),
   });
 
   user.save(function(err) {
@@ -58,9 +59,10 @@ function registerUser(req, res, next) {
  * В ответе отправляем тип проведённой операции.
  */
 function loginUser(req, res, user, next, isJustRegistered) {
-  req.logIn(user, function(err) {
-    if (err)
-      return next(err);
+  req.logIn(user, function(loginErr) {
+    if (loginErr) {
+      return next(loginErr);
+    }
 
     if (isJustRegistered) {
       return res.json({
@@ -69,10 +71,12 @@ function loginUser(req, res, user, next, isJustRegistered) {
       });
     }
 
-    var newName, newLastname;
+    let newName;
     if (req.body.name && req.body.name !== user.name) {
       newName = req.body.name;
     }
+
+    let newLastname;
     if (req.body.lastname && req.body.lastname !== user.lastname) {
       newLastname = req.body.lastname;
     }
@@ -92,22 +96,13 @@ function loginUser(req, res, user, next, isJustRegistered) {
       user.lastname = newLastname;
     }
 
-    user.save(function(err) {
-      return err ? next(err) : res.json({
+    user.save(function(saveErr) {
+      return saveErr ? next(saveErr) : res.json({
         operation: RESULT_TYPE.LOGIN,
         user: UserPresenter.getData(user),
       });
     });
   });
-}
-
-function getUserResponseData(user) {
-  return {
-    id: user._id,
-    name: user.name,
-    lastname: user.lastname,
-    regDate: new Date(user.regDate).toLocaleDateString(),
-  }
 }
 
 module.exports = auth;
