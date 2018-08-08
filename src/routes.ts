@@ -1,13 +1,14 @@
+import { Express } from 'express';
+import handlers from './handlers/index';
+import * as passportHelper from './libs/passportHelper';
+
 /**
  * В этом модуле описываем все маршруты запросов
- * @param app - объект приложения
- * @param handlers - объект, содержащий обработчики
- * @param ensureAuth - middleware, отвечающий за проверку авторизации
  */
-module.exports.setup = function(app, handlers, ensureAuth) {
+export function setup(app: Express) {
   app.post('/api/auth', handlers.auth);
 
-  app.all('/api/*', ensureAuth);
+  app.all('/api/*', passportHelper.ensureAuthenticated);
 
   app.get('/api/user/get/:user_id?', handlers.user.getById);
 
@@ -19,4 +20,4 @@ module.exports.setup = function(app, handlers, ensureAuth) {
   app.post('/api/friendship/request/:user_id', handlers.friendship.request);
   app.post('/api/friendship/accept/:friendship_id', handlers.friendship.accept);
   app.post('/api/friendship/decline/:friendship_id', handlers.friendship.decline);
-};
+}

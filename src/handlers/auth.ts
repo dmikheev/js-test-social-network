@@ -1,11 +1,11 @@
-const UserPresenter = require('./presenters/userPresenter');
+import { NextFunction, Request, RequestHandler, Response } from 'express';
+import passport from 'passport';
+import User, { IUserDocument } from '../models/user';
+import UserPresenter from './presenters/userPresenter';
 
 /**
  * Обработка запроса на логин или регистрацию
  */
-const passport = require('passport');
-
-const User = require('../models/user').default;
 
 /**
  * Константы, обозначающие тип операции
@@ -18,28 +18,29 @@ const RESULT_TYPE = {
 /**
  * Проверяем результаты аутентификации
  */
-function auth(req, res, next) {
-  passport.authenticate('local', function(err, user, info) {
+const auth: RequestHandler = (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
     if (err) {
       return next(err);
     }
 
     if (!user) {
-      if (info.userFound) {
+      if (info) {
         return res.status(401).json({ error: { message: info.message } });
-      } else {
-        return registerUser(req, res, next);
       }
+
+      return registerUser(req, res, next);
     }
 
     return loginUser(req, res, user, next);
   })(req, res, next);
-}
+};
+export default auth;
 
 /**
  * Регистрируем пользователя
  */
-function registerUser(req, res, next) {
+async function registerUser(req: Request, res: Response, next: NextFunction) {
   const user = new User({
     lastname: req.body.lastname,
     login: req.body.login,
@@ -48,9 +49,13 @@ function registerUser(req, res, next) {
     regDate: new Date(),
   });
 
-  user.save(function(err) {
-    return err ? next(err) : loginUser(req, res, user, next, true);
-  });
+  try {
+    await user.save();
+
+    return loginUser(req, res, user, next, true);
+  } catch (err) {
+    return next(err);
+  }
 }
 
 /**
@@ -58,8 +63,8 @@ function registerUser(req, res, next) {
  * и пользователь не только что зарегистрирован.
  * В ответе отправляем тип проведённой операции.
  */
-function loginUser(req, res, user, next, isJustRegistered) {
-  req.logIn(user, function(loginErr) {
+function loginUser(req: Request, res: Response, user: IUserDocument, next: NextFunction, isJustRegistered = false) {
+  req.logIn(user, async (loginErr) => {
     if (loginErr) {
       return next(loginErr);
     }
@@ -96,7 +101,7 @@ function loginUser(req, res, user, next, isJustRegistered) {
       user.lastname = newLastname;
     }
 
-    user.save(function(saveErr) {
+    user.save((saveErr) => {
       return saveErr ? next(saveErr) : res.json({
         operation: RESULT_TYPE.LOGIN,
         user: UserPresenter.getData(user),
@@ -104,5 +109,3 @@ function loginUser(req, res, user, next, isJustRegistered) {
     });
   });
 }
-
-module.exports = auth;

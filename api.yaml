@@ -116,6 +116,8 @@ paths:
                 $ref: "#/components/schemas/Error"
         '401':
           $ref: "#/components/responses/AuthRequired"
+        '403':
+          $ref: "#/components/responses/Forbidden"
         '404':
           $ref: "#/components/responses/NotFound"
 
@@ -140,6 +142,8 @@ paths:
               $ref: "#/components/schemas/Error"
       '401':
         $ref: "#/components/responses/AuthRequired"
+      '403':
+        $ref: "#/components/responses/Forbidden"
       '404':
         $ref: "#/components/responses/NotFound"
 
@@ -147,6 +151,12 @@ components:
   responses:
     AuthRequired:
       description: Auth required
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Forbidden:
+      description: User is not allowed to perform requested operation
       content:
         application/json:
           schema:

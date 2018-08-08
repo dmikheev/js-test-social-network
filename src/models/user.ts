@@ -11,15 +11,13 @@ const loginValidationErrorText = 'Login must be 4-8 long alphanumeric string and
 const passValidationErrorText =
   'Password must be 6-12 long alphanumeric string and contain at least one number and letter';
 
-interface IUser {
+export interface IUserDocument extends Document {
   lastname: string;
   login: string;
   name: string;
   pass: string;
   regDate: string;
-}
 
-interface IUserModel extends IUser, Document {
   comparePass(enteredPass: string): Promise<boolean>;
 }
 
@@ -41,7 +39,7 @@ const userSchema = new mongoose.Schema({
 userSchema.index({ name: 'text', lastname: 'text' });
 
 /** Cохраняем не пароль, а его хеш, используя bcrypt */
-userSchema.pre<IUserModel>('save', async function(next) {
+userSchema.pre<IUserDocument>('save', async function(next) {
   if (!this.isModified('pass')) {
     return next();
   }
@@ -61,7 +59,7 @@ userSchema.methods.comparePass = function(enteredPass: string): Promise<boolean>
   return bcrypt.compare(enteredPass, this.pass);
 };
 
-const User = mongoose.model<IUserModel>('User', userSchema);
+const User = mongoose.model<IUserDocument>('User', userSchema);
 export default User;
 
 /** Функции валидации полей */

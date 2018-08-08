@@ -2,21 +2,23 @@
  * Настройка библиотеки passport
  */
 
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
+import { RequestHandler } from 'express';
+import passport from 'passport';
+import passportLocal from 'passport-local';
+import User, { IUserDocument } from '../models/user';
 
-const User = require('./../models/user').default;
+const LocalStrategy = passportLocal.Strategy;
 
-function init() {
+export function init() {
   /** В cookie храним id пользователя */
-  passport.serializeUser(function(user, done) {
+  passport.serializeUser<IUserDocument, any>((user, done) => {
     done(null, user._id);
   });
 
   /** Для проверки авторизации получаем пользователя из базы по id из cookie */
-  passport.deserializeUser(function(id, done) {
-    User.findById(id, function(err, user) {
-      done(err, user);
+  passport.deserializeUser((id, done) => {
+    User.findById(id, (err, user) => {
+      done(err, user as any);
     });
   });
 
@@ -31,21 +33,18 @@ function init() {
       passwordField: 'pass',
       usernameField: 'login',
     },
-    async function(login, pass, done) {
+    async (login, pass, done) => {
       try {
         const user = await User.findOne({ login });
 
         if (!user) {
-          return done(null, false, { userFound: false });
+          return done(null, false);
         }
 
         const isPassMatched = await user.comparePass(pass);
         return isPassMatched ?
           done(null, user) :
-          done(null, false, {
-            message: 'Invalid password',
-            userFound: true,
-          });
+          done(null, false, { message: 'Invalid password' });
       } catch (err) {
         return done(err);
       }
@@ -54,15 +53,10 @@ function init() {
 }
 
 /** Middleware для проверки авторизации. При ошибке возвращаем код 401. */
-function ensureAuthenticated(req, res, next) {
+export const ensureAuthenticated: RequestHandler = (req, res, next) => {
   if (req.isAuthenticated()) {
     return next();
   }
 
   res.status(401).json({ error: { message: 'Authorization required.' } });
-}
-
-module.exports = {
-  ensureAuthenticated: ensureAuthenticated,
-  init: init,
 };

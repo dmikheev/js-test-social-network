@@ -11,7 +11,7 @@ import passport from 'passport';
 
 import errorHandler from './errorHandler';
 import config from './libs/config';
-import passportHelper = require('./libs/passportHelper');
+import * as passportHelper from './libs/passportHelper';
 import routes = require('./routes');
 
 mongoose.Promise = Promise;
@@ -40,9 +40,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-import handlers = require('./handlers/main');
-
-routes.setup(app, handlers, passportHelper.ensureAuthenticated);
+routes.setup(app);
 app.use(express.static('client/dist'));
 
 app.use(errorHandler);

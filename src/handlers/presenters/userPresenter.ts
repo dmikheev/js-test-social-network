@@ -1,6 +1,17 @@
-module.exports = {
-  getData(user, additionalData = {}) {
-    const resultData = {};
+import { IUserDocument } from '../../models/user';
+
+export interface IUserClientData {
+  [key: string]: any;
+
+  id: string;
+  name: string;
+  lastname: string;
+  regDate: string;
+}
+
+const UserPresenter = {
+  getData(user: IUserDocument, additionalData: any = {}): IUserClientData {
+    const resultData = {} as IUserClientData;
 
     if (user._id) {
       resultData.id = user._id;
@@ -18,3 +29,4 @@ module.exports = {
     return Object.assign(resultData, additionalData);
   },
 };
+export default UserPresenter;

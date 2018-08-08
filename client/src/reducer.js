@@ -71,10 +71,12 @@ export default function(state, action) {
       const changingUserIdx =
         searchPageUsers.findIndex((user) => user.get('id') === action.data.receiver.id);
 
-      return newState.setIn(
-        ['searchPage', 'users', changingUserIdx, 'status'],
-        SEARCH_USER_FRIENDSHIP_STATUSES.REQUESTED,
-      );
+      return newState
+        .setIn(
+          ['searchPage', 'users', changingUserIdx, 'status'],
+          SEARCH_USER_FRIENDSHIP_STATUSES.REQUESTED,
+        )
+        .setIn(['searchPage', 'users', changingUserIdx, 'friendshipId'], action.data.id);
     }
 
     case ACTIONS.ACCEPT_FRIENDSHIP_RESPONSE: {
