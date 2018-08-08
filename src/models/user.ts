@@ -61,7 +61,8 @@ userSchema.methods.comparePass = function(enteredPass: string): Promise<boolean>
   return bcrypt.compare(enteredPass, this.pass);
 };
 
-export default mongoose.model<IUserModel>('User', userSchema);
+const User = mongoose.model<IUserModel>('User', userSchema);
+export default User;
 
 /** Функции валидации полей */
 function nameValidator(value: string): boolean {

@@ -3,6 +3,7 @@
  */
 
 import bodyParser from 'body-parser';
+import compression from 'compression';
 import express from 'express';
 import session from 'express-session';
 import mongoose from 'mongoose';
@@ -28,6 +29,7 @@ passportHelper.init();
 
 const app = express();
 
+app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({

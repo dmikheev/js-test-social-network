@@ -104,7 +104,8 @@ friendshipSchema.statics.getItemsForUser = function(userId, populate, callback) 
   });
 };
 
-module.exports = mongoose.model('Friendship', friendshipSchema);
+const Friendship = mongoose.model('Friendship', friendshipSchema);
+module.exports = Friendship;
 
 /**
  * Собираем итоговый объект для функции getItemsForUser
