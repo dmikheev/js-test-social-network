@@ -39,14 +39,11 @@ friendshipSchema.methods.accept = function(acceptedUserId, cb) {
 
 friendshipSchema.methods.decline = function(declinedUserId, cb) {
   if (this.accepted) {
-    if (
-      this.senderId !== declinedUserId &&
-      this.receiverId !== declinedUserId
-    ) {
+    if (!this.senderId.equals(declinedUserId) && !this.receiverId.equals(declinedUserId)) {
       return cb(new WrongUserDeclineFriendshipError());
     }
 
-    if (this.receiverId === declinedUserId) {
+    if (this.receiverId.equals(declinedUserId)) {
       this.accepted = false;
       return this.save((err) => cb(err, this));
     } else {
@@ -57,7 +54,7 @@ friendshipSchema.methods.decline = function(declinedUserId, cb) {
       return this.save((err) => cb(err, this));
     }
   } else {
-    if (this.senderId !== declinedUserId) {
+    if (!this.senderId.equals(declinedUserId)) {
       return cb(new WrongUserDeclineFriendshipError());
     }
 

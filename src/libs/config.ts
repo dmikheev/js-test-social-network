@@ -2,7 +2,7 @@
  * Настройка библиотеки конфигурации nconf
  */
 
-var nconf = require('nconf');
+import nconf from 'nconf';
 
 /**
  * Настраиваем nconf на использование (в следующем порядке):
@@ -14,4 +14,4 @@ nconf.argv()
   .env()
   .file({ file: 'config/config.json' });
 
-module.exports = nconf;
+export default nconf;

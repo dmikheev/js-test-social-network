@@ -5,7 +5,7 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
-const User = require('./../models/user');
+const User = require('./../models/user').default;
 
 function init() {
   /** В cookie храним id пользователя */
@@ -26,35 +26,31 @@ function init() {
    *  - {Boolean} userFound - найден ли пользователь по логину или нет
    *  - {String} message - сообщение об ошибке
    */
-  passport.use(new LocalStrategy({
-    passwordField: 'pass',
-    usernameField: 'login',
-  }, function(login, pass, done) {
-    User.findOne({ login: login }, function(findErr, user) {
-      if (findErr) {
-        return done(findErr);
-      }
+  passport.use(new LocalStrategy(
+    {
+      passwordField: 'pass',
+      usernameField: 'login',
+    },
+    async function(login, pass, done) {
+      try {
+        const user = await User.findOne({ login });
 
-      if (!user) {
-        return done(null, false, { userFound: false });
-      }
-
-      user.comparePass(pass, function(passErr, isMatch) {
-        if (passErr) {
-          return done(passErr);
+        if (!user) {
+          return done(null, false, { userFound: false });
         }
 
-        if (isMatch) {
-          return done(null, user);
-        } else {
-          return done(null, false, {
+        const isPassMatched = await user.comparePass(pass);
+        return isPassMatched ?
+          done(null, user) :
+          done(null, false, {
             message: 'Invalid password',
             userFound: true,
           });
-        }
-      });
-    });
-  }));
+      } catch (err) {
+        return done(err);
+      }
+    },
+  ));
 }
 
 /** Middleware для проверки авторизации. При ошибке возвращаем код 401. */

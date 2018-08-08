@@ -3,7 +3,7 @@ const UserPresenter = require('./presenters/userPresenter');
 /**
  * Обработчик запроса на получение профиля пользователя.
  */
-const User = require('../models/user');
+const User = require('../models/user').default;
 
 /**
  * В параметрах запроса берём id пользователя

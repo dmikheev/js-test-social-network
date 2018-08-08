@@ -5,7 +5,7 @@ const UserPresenter = require('./presenters/userPresenter');
  */
 const passport = require('passport');
 
-const User = require('../models/user');
+const User = require('../models/user').default;
 
 /**
  * Константы, обозначающие тип операции

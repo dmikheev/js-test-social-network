@@ -2,14 +2,14 @@
  * Основной модуль сервера
  */
 
-import bodyParser = require('body-parser');
-import express = require('express');
-import session = require('express-session');
-import mongoose = require('mongoose');
-import passport = require('passport');
+import bodyParser from 'body-parser';
+import express from 'express';
+import session from 'express-session';
+import mongoose from 'mongoose';
+import passport from 'passport';
 
-import errorHandler = require('./errorHandler');
-import config = require('./libs/config');
+import errorHandler from './errorHandler';
+import config from './libs/config';
 import passportHelper = require('./libs/passportHelper');
 import routes = require('./routes');
 

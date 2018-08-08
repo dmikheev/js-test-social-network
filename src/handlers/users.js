@@ -3,7 +3,7 @@
  */
 const _ = require('underscore');
 
-const User = require('../models/user');
+const User = require('../models/user').default;
 const Friendship = require('../models/friendship');
 const UserPresenter = require('./presenters/userPresenter');
 const USER_FRIENDSHIP_STATUS = require('./usersSearchFriendshipStatuses').SEARCH_USER_FRIENDSHIP_STATUSES;
@@ -80,7 +80,7 @@ module.exports = {
  * @param friendships - объект содержащий списки дружбы из models/friendship.getItemsForUser
  */
 function setUserFriendshipStatus(candidate, mainUser, friendships) {
-  if (candidate._id === mainUser.id) {
+  if (candidate._id.equals(mainUser.id)) {
     candidate.status = USER_FRIENDSHIP_STATUS.SELF;
     return;
   }

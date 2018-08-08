@@ -1,4 +1,4 @@
-const User = require('../models/user');
+const User = require('../models/user').default;
 const Friendship = require('../models/friendship');
 const FriendshipPresenter = require('./presenters/friendshipPresenter');
 const WrongUserAcceptFriendshipError = require('../errors/wrongUserAcceptFriendshipError');
