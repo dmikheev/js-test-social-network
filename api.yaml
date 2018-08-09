@@ -229,33 +229,23 @@ components:
     UsersFindResponse:
       type: object
       required:
-      - foundUserIds
+      - currentUserFriendships
+      - foundUsers
       - itemsPerPage
       - totalItemsCount
-      - entities
       properties:
-        foundUserIds:
+        currentUserFriendships:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/Friendship"
+        foundUsers:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
         itemsPerPage:
           type: integer
         totalItemsCount:
           type: integer
-        entities:
-          type: object
-          required:
-          - friendships
-          - users
-          properties:
-            friendships:
-              type: array
-              items:
-                $ref: "#/components/schemas/Friendship"
-            users:
-              type: array
-              items:
-                $ref: "#/components/schemas/User"
 
     FriendshipsGetAllResponse:
       type: object

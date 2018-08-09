@@ -10,7 +10,7 @@ import UserPresenter from '../handlers/presenters/userPresenter';
 const ObjectId = mongoose.Schema.Types.ObjectId;
 type TObjectId = mongoose.Types.ObjectId;
 
-interface IFriendshipDocument extends Document {
+export interface IFriendshipDocument extends Document {
   accepted: boolean;
   receiverId: TObjectId;
   senderId: TObjectId;
@@ -20,7 +20,10 @@ interface IFriendshipDocument extends Document {
   decline(declinedUserId: string, callback?: (err: Error | null, friendship?: IFriendshipDocument) => void):
     Promise<IFriendshipDocument>;
 }
+
+type TFindFriendshipsForUserFunc = (userId: TObjectId) => Promise<IFriendshipDocument[]>;
 interface IFriendshipModel extends Model<IFriendshipDocument> {
+  findFriendshipsForUser: TFindFriendshipsForUserFunc;
   getItemsForUser(userId: TObjectId, populate: boolean, callback?: (err: Error | null, result?: any) => void):
     Promise<any>;
 }
@@ -174,6 +177,16 @@ friendshipSchema.methods.decline = function(
     resolve(savePromise);
   });
 };
+
+const findFriendshipsForUser: TFindFriendshipsForUserFunc = async function(this: IFriendshipModel, userId) {
+  const [sentFriendships, receivedFriendships] = await Promise.all([
+    this.find({ senderId: userId }).exec(),
+    this.find({ receiverId: userId }).exec(),
+  ]);
+
+  return sentFriendships.concat(receivedFriendships);
+};
+friendshipSchema.statics.findFriendshipsForUser = findFriendshipsForUser;
 
 /**
  * Получаем объект с заявками и друзьями пользователя

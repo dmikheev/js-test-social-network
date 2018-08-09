@@ -47,7 +47,7 @@ export const request: RequestHandler = async (req, res, next) => {
 
     await newFriendship.save();
 
-    return res.json(FriendshipPresenter.getData(newFriendship));
+    return res.json(FriendshipPresenter.getDataOld(newFriendship));
   } catch (err) {
     return next(err);
   }
@@ -74,7 +74,7 @@ export const accept: RequestHandler = async (req, res, next) => {
     friendship.populate('receiverId');
     await friendship.execPopulate();
 
-    return res.json(FriendshipPresenter.getData(friendship));
+    return res.json(FriendshipPresenter.getDataOld(friendship));
   } catch (err) {
     if (err instanceof WrongUserAcceptFriendshipError) {
       return res.status(403).json({
@@ -110,7 +110,7 @@ export const decline: RequestHandler = async (req, res, next) => {
     newFriendshipData.populate('receiverId');
     await newFriendshipData.execPopulate();
 
-    return res.json(FriendshipPresenter.getData(newFriendshipData));
+    return res.json(FriendshipPresenter.getDataOld(newFriendshipData));
   } catch (err) {
     if (err instanceof WrongUserDeclineFriendshipError) {
       return res.status(403).json({

@@ -3,7 +3,7 @@
  */
 
 import bcrypt from 'bcrypt';
-import mongoose, { Document } from 'mongoose';
+import mongoose, { Document, Model } from 'mongoose';
 
 /** Тексты ошибок валидации полей */
 const nameValidationErrorText = '"{PATH}" must be 2-32 long alphabetic string';
@@ -19,6 +19,16 @@ export interface IUserDocument extends Document {
   regDate: string;
 
   comparePass(enteredPass: string): Promise<boolean>;
+}
+
+interface ISearchByTextResult {
+  totalCount: number;
+  users: IUserDocument[];
+}
+type TSearchByTextFunc =
+  (searchString: string, resultsPerPage: number, pageNum: number) => Promise<ISearchByTextResult>;
+interface IUserModel extends Model<IUserDocument> {
+  searchByText: TSearchByTextFunc;
 }
 
 /**
@@ -59,7 +69,31 @@ userSchema.methods.comparePass = function(enteredPass: string): Promise<boolean>
   return bcrypt.compare(enteredPass, this.pass);
 };
 
-const User = mongoose.model<IUserDocument>('User', userSchema);
+const searchByText: TSearchByTextFunc = async function(this: IUserModel, searchString, resultsPerPage, pageNum) {
+  let countQuery;
+  let findQuery;
+  if (!searchString) {
+    countQuery = this.estimatedDocumentCount();
+    findQuery = this.find();
+  } else {
+    const filter = { $text: { $search: searchString } };
+    countQuery = this.countDocuments(filter);
+    findQuery = this
+      .find(filter, { score: { $meta: 'textScore' } })
+      .sort({ score: { $meta: 'textScore' } });
+  }
+
+  findQuery = findQuery
+    .skip(pageNum * resultsPerPage)
+    .limit(resultsPerPage);
+
+  const [totalCount, users] = await Promise.all([countQuery.exec(), findQuery.exec()]);
+
+  return { totalCount, users };
+};
+userSchema.statics.searchByText = searchByText;
+
+const User = mongoose.model<IUserDocument, IUserModel>('User', userSchema);
 export default User;
 
 /** Функции валидации полей */
