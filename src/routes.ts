@@ -1,4 +1,6 @@
-import { Express } from 'express';
+import { Express, RequestHandler } from 'express';
+import path from 'path';
+import { CLIENT_PATH } from './constants/constants';
 import handlers from './handlers/index';
 import * as passportHelper from './libs/passportHelper';
 
@@ -21,3 +23,15 @@ export function setup(app: Express) {
   app.post('/api/friendship/accept/:friendship_id', handlers.friendship.accept);
   app.post('/api/friendship/decline/:friendship_id', handlers.friendship.decline);
 }
+
+export function setupHistoryApiFallback(app: Express) {
+  app.get('*', returnIndex);
+}
+
+const returnIndex: RequestHandler = (req, res, next) => {
+  try {
+    return res.sendFile(path.resolve(CLIENT_PATH, 'index.html'));
+  } catch (err) {
+    return next(err);
+  }
+};

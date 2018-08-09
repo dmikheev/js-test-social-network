@@ -1,7 +1,7 @@
 import React from 'react';
 import { hot } from 'react-hot-loader';
 import { Provider } from 'react-redux';
-import { HashRouter, Redirect, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import App from './components/App';
 import FriendsPage from './components/pages/FriendsPage/FriendsPage';
 import friendsPath from './components/pages/FriendsPage/friendsPath';
@@ -17,7 +17,7 @@ import './root.css';
 
 const Root: React.StatelessComponent = () => (
   <Provider store={store}>
-    <HashRouter>
+    <BrowserRouter>
       <App>
         <Switch>
           <Route path={loginPath} component={LoginPage}/>
@@ -27,7 +27,7 @@ const Root: React.StatelessComponent = () => (
           <Redirect path="*" to={profilePath}/>
         </Switch>
       </App>
-    </HashRouter>
+    </BrowserRouter>
   </Provider>
 );
 export default hot(module)(Root);

@@ -8,11 +8,11 @@ import express from 'express';
 import session from 'express-session';
 import mongoose from 'mongoose';
 import passport from 'passport';
-
+import { CLIENT_PATH } from './constants/constants';
 import errorHandler from './errorHandler';
 import config from './libs/config';
 import * as passportHelper from './libs/passportHelper';
-import routes = require('./routes');
+import * as routes from './routes';
 
 mongoose.Promise = Promise;
 mongoose.connect(`mongodb://${config.get('db:host')}:${config.get('db:port')}/${config.get('db:name')}`, {
@@ -41,7 +41,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 routes.setup(app);
-app.use(express.static('client/dist'));
+app.use(express.static(CLIENT_PATH));
+routes.setupHistoryApiFallback(app);
 
 app.use(errorHandler);
 

@@ -5,6 +5,7 @@ module.exports = (env = {}) => {
   return {
     devServer: {
       contentBase: './dist',
+      historyApiFallback: true,
       hot: true,
       proxy: {
         '/api/**': {
