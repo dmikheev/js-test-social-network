@@ -21,12 +21,6 @@ export interface IUserDocument extends Document {
   comparePass(enteredPass: string): Promise<boolean>;
 }
 
-interface ISearchByTextResult {
-  totalCount: number;
-  users: IUserDocument[];
-}
-type TSearchByTextFunc =
-  (searchString: string, resultsPerPage: number, pageNum: number) => Promise<ISearchByTextResult>;
 interface IUserModel extends Model<IUserDocument> {
   searchByText: TSearchByTextFunc;
 }
@@ -69,6 +63,12 @@ userSchema.methods.comparePass = function(enteredPass: string): Promise<boolean>
   return bcrypt.compare(enteredPass, this.pass);
 };
 
+interface ISearchByTextResult {
+  totalCount: number;
+  users: IUserDocument[];
+}
+type TSearchByTextFunc =
+  (searchString: string, resultsPerPage: number, pageNum: number) => Promise<ISearchByTextResult>;
 const searchByText: TSearchByTextFunc = async function(this: IUserModel, searchString, resultsPerPage, pageNum) {
   let countQuery;
   let findQuery;
@@ -93,7 +93,7 @@ const searchByText: TSearchByTextFunc = async function(this: IUserModel, searchS
 };
 userSchema.statics.searchByText = searchByText;
 
-const User = mongoose.model<IUserDocument, IUserModel>('User', userSchema);
+const User: IUserModel = mongoose.model<IUserDocument, IUserModel>('User', userSchema);
 export default User;
 
 /** Функции валидации полей */

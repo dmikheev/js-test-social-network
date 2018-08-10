@@ -4,6 +4,6 @@ import { ErrorRequestHandler } from 'express';
  */
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-  res.status(500).json({ error: err });
+  res.status(err.status || 500).json({ error: err });
 };
 export default errorHandler;

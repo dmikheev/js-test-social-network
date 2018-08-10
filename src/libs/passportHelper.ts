@@ -5,6 +5,7 @@
 import { RequestHandler } from 'express';
 import passport from 'passport';
 import passportLocal from 'passport-local';
+import ApplicationError from '../errors/applicationError';
 import User, { IUserDocument } from '../models/user';
 
 const LocalStrategy = passportLocal.Strategy;
@@ -58,5 +59,5 @@ export const ensureAuthenticated: RequestHandler = (req, res, next) => {
     return next();
   }
 
-  res.status(401).json({ error: { message: 'Authorization required.' } });
+  return next(new ApplicationError('Authorization required.', 401));
 };

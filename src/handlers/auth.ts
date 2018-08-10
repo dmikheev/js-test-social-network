@@ -1,5 +1,6 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import passport from 'passport';
+import ApplicationError from '../errors/applicationError';
 import User, { IUserDocument } from '../models/user';
 import UserPresenter from './presenters/userPresenter';
 
@@ -26,7 +27,7 @@ const auth: RequestHandler = (req, res, next) => {
 
     if (!user) {
       if (info) {
-        return res.status(401).json({ error: { message: info.message } });
+        return next(new ApplicationError(info.message, 401));
       }
 
       return registerUser(req, res, next);

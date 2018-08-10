@@ -11,8 +11,6 @@ import { IUserDocument } from './user';
 const ObjectId = mongoose.Schema.Types.ObjectId;
 type TObjectId = mongoose.Types.ObjectId;
 
-type TAcceptFunc = (acceptedUserId: string) => Promise<IFriendshipDocument>;
-type TDeclineFunc = (declinedUserId: string) => Promise<IFriendshipDocument | null>;
 export interface IFriendshipDocument extends Document {
   accepted: boolean;
   receiverId: TObjectId;
@@ -21,14 +19,6 @@ export interface IFriendshipDocument extends Document {
   accept: TAcceptFunc;
   decline: TDeclineFunc;
 }
-
-type TFindFriendshipsForUserFunc = (userId: TObjectId) => Promise<IFriendshipDocument[]>;
-
-interface IFindFriendshipsWithUsersResult {
-  friendships: IFriendshipDocument[];
-  users: IUserDocument[];
-}
-type TFindFriendshipsWithUsersForUserFunc = (userId: TObjectId) => Promise<IFindFriendshipsWithUsersResult>;
 
 interface IFriendshipModel extends Model<IFriendshipDocument> {
   findFriendshipsForUser: TFindFriendshipsForUserFunc;
@@ -49,6 +39,7 @@ const friendshipSchema = new mongoose.Schema({
 friendshipSchema.index({ senderId: 1 });
 friendshipSchema.index({ receiverId: 1 });
 
+type TAcceptFunc = (acceptedUserId: string) => Promise<IFriendshipDocument>;
 const accept: TAcceptFunc = async function(this: IFriendshipDocument, acceptedUserId) {
   if (!this.receiverId.equals(acceptedUserId)) {
     throw new WrongUserAcceptFriendshipError();
@@ -65,6 +56,7 @@ const accept: TAcceptFunc = async function(this: IFriendshipDocument, acceptedUs
 };
 friendshipSchema.methods.accept = accept;
 
+type TDeclineFunc = (declinedUserId: string) => Promise<IFriendshipDocument | null>;
 const decline: TDeclineFunc = async function(this: IFriendshipDocument, declinedUserId) {
   if (!this.accepted) {
     if (!this.senderId.equals(declinedUserId)) {
@@ -97,6 +89,7 @@ const decline: TDeclineFunc = async function(this: IFriendshipDocument, declined
 
 friendshipSchema.methods.decline = decline;
 
+type TFindFriendshipsForUserFunc = (userId: TObjectId) => Promise<IFriendshipDocument[]>;
 const findFriendshipsForUser: TFindFriendshipsForUserFunc = async function(this: IFriendshipModel, userId) {
   const [sentFriendships, receivedFriendships] = await Promise.all([
     this.find({ senderId: userId }).exec(),
@@ -111,6 +104,11 @@ interface IFriendshipDocumentPopulated extends Omit<IFriendshipDocument, 'receiv
   receiverId: TObjectId | IUserDocument;
   senderId: TObjectId | IUserDocument;
 }
+interface IFindFriendshipsWithUsersResult {
+  friendships: IFriendshipDocument[];
+  users: IUserDocument[];
+}
+type TFindFriendshipsWithUsersForUserFunc = (userId: TObjectId) => Promise<IFindFriendshipsWithUsersResult>;
 const findFriendshipsWithUsersForUser: TFindFriendshipsWithUsersForUserFunc =
   async function(this: IFriendshipModel, userId) {
     const queries = await Promise.all([
@@ -145,5 +143,6 @@ const findFriendshipsWithUsersForUser: TFindFriendshipsWithUsersForUserFunc =
   };
 friendshipSchema.statics.findFriendshipsWithUsersForUser = findFriendshipsWithUsersForUser;
 
-const Friendship = mongoose.model<IFriendshipDocument, IFriendshipModel>('Friendship', friendshipSchema);
+const Friendship: IFriendshipModel =
+  mongoose.model<IFriendshipDocument, IFriendshipModel>('Friendship', friendshipSchema);
 export default Friendship;

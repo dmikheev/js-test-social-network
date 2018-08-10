@@ -1,6 +1,5 @@
 import { RequestHandler } from 'express';
-import WrongUserAcceptFriendshipError from '../errors/wrongUserAcceptFriendshipError';
-import WrongUserDeclineFriendshipError from '../errors/wrongUserDeclineFriendshipError';
+import ApplicationError from '../errors/applicationError';
 import Friendship from '../models/friendship';
 import User from '../models/user';
 import FriendshipPresenter from './presenters/friendshipPresenter';
@@ -19,35 +18,29 @@ export const request: RequestHandler = async (req, res, next) => {
   const receiverId = req.params.user_id;
 
   if (senderId.equals(receiverId)) {
-    return res.status(400).json({
-      error: { message: 'You cannot request friendship with yourself!' },
-    });
+    return next(new ApplicationError('You cannot request friendship with yourself!', 400));
   }
 
   try {
     const user = await User.findById(receiverId);
     if (!user) {
-      return res.status(404).json({
-        error: { message: 'Receiving user not found' },
-      });
+      return next(new ApplicationError('Receiving user not found', 404));
     }
 
     const friendship = await Friendship.findOne({ senderId, receiverId });
     if (friendship) {
-      return res.status(400).json({
-        error: { message: 'Friendship already exists' },
-      });
+      return res.json(FriendshipPresenter.getData(friendship));
     }
 
     const newFriendship = new Friendship({
       accepted: false,
-      receiverId: user,
-      senderId: req.user,
+      receiverId: user._id,
+      senderId: req.user._id,
     });
 
     await newFriendship.save();
 
-    return res.json(FriendshipPresenter.getDataOld(newFriendship));
+    return res.json(FriendshipPresenter.getData(newFriendship));
   } catch (err) {
     return next(err);
   }
@@ -63,25 +56,12 @@ export const accept: RequestHandler = async (req, res, next) => {
   try {
     const friendship = await Friendship.findById(friendshipId);
     if (!friendship) {
-      return res.status(404).json({
-        error: { message: 'Friendship not found' },
-      });
+      return next(new ApplicationError('Friendship not found', 404));
     }
 
     await friendship.accept(req.user.id);
-
-    friendship.populate('senderId');
-    friendship.populate('receiverId');
-    await friendship.execPopulate();
-
-    return res.json(FriendshipPresenter.getDataOld(friendship));
+    return res.json(FriendshipPresenter.getData(friendship));
   } catch (err) {
-    if (err instanceof WrongUserAcceptFriendshipError) {
-      return res.status(403).json({
-        error: { message: 'You cannot accept this request' },
-      });
-    }
-
     return next(err);
   }
 };
@@ -96,28 +76,15 @@ export const decline: RequestHandler = async (req, res, next) => {
   try {
     const friendship = await Friendship.findById(friendshipId);
     if (!friendship) {
-      return res.status(404).json({
-        error: { message: 'Friendship not found' },
-      });
+      return next(new ApplicationError('Friendship not found', 404));
     }
 
     const newFriendshipData = await friendship.decline(req.user.id);
-    if (!newFriendshipData) {
-      return res.status(204).send();
-    }
-
-    newFriendshipData.populate('senderId');
-    newFriendshipData.populate('receiverId');
-    await newFriendshipData.execPopulate();
-
-    return res.json(FriendshipPresenter.getDataOld(newFriendshipData));
+    return res.json({
+      friendship: newFriendshipData ? FriendshipPresenter.getData(newFriendshipData) : undefined,
+      isDeleted: !newFriendshipData,
+    });
   } catch (err) {
-    if (err instanceof WrongUserDeclineFriendshipError) {
-      return res.status(403).json({
-        error: { message: 'You cannot decline this request' },
-      });
-    }
-
     return next(err);
   }
 };
