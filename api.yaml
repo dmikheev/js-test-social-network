@@ -250,22 +250,17 @@ components:
     FriendshipsGetAllResponse:
       type: object
       required:
-      - entities
+      - friendships
+      - users
       properties:
-        entities:
-          type: object
-          required:
-          - friendships
-          - users
-          properties:
-            friendships:
-              type: array
-              items:
-                $ref: "#/components/schemas/Friendship"
-            users:
-              type: array
-              items:
-                $ref: "#/components/schemas/User"
+        friendships:
+          type: array
+          items:
+            $ref: "#/components/schemas/Friendship"
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
 
     FriendshipDeclineResponse:
       type: object

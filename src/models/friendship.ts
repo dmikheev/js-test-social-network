@@ -1,7 +1,8 @@
 import mongoose, { Document, Model } from 'mongoose';
 import WrongUserAcceptFriendshipError from '../errors/wrongUserAcceptFriendshipError';
 import WrongUserDeclineFriendshipError from '../errors/wrongUserDeclineFriendshipError';
-import UserPresenter from '../handlers/presenters/userPresenter';
+import { Omit } from '../utils/ts';
+import { IUserDocument } from './user';
 
 /**
  * Модель дружбы для mongoose
@@ -10,22 +11,28 @@ import UserPresenter from '../handlers/presenters/userPresenter';
 const ObjectId = mongoose.Schema.Types.ObjectId;
 type TObjectId = mongoose.Types.ObjectId;
 
+type TAcceptFunc = (acceptedUserId: string) => Promise<IFriendshipDocument>;
+type TDeclineFunc = (declinedUserId: string) => Promise<IFriendshipDocument | null>;
 export interface IFriendshipDocument extends Document {
   accepted: boolean;
   receiverId: TObjectId;
   senderId: TObjectId;
 
-  accept(acceptedUserId: string, callback?: (err: Error | null, friendship?: IFriendshipDocument) => void):
-    Promise<IFriendshipDocument>;
-  decline(declinedUserId: string, callback?: (err: Error | null, friendship?: IFriendshipDocument) => void):
-    Promise<IFriendshipDocument>;
+  accept: TAcceptFunc;
+  decline: TDeclineFunc;
 }
 
 type TFindFriendshipsForUserFunc = (userId: TObjectId) => Promise<IFriendshipDocument[]>;
+
+interface IFindFriendshipsWithUsersResult {
+  friendships: IFriendshipDocument[];
+  users: IUserDocument[];
+}
+type TFindFriendshipsWithUsersForUserFunc = (userId: TObjectId) => Promise<IFindFriendshipsWithUsersResult>;
+
 interface IFriendshipModel extends Model<IFriendshipDocument> {
   findFriendshipsForUser: TFindFriendshipsForUserFunc;
-  getItemsForUser(userId: TObjectId, populate: boolean, callback?: (err: Error | null, result?: any) => void):
-    Promise<any>;
+  findFriendshipsWithUsersForUser: TFindFriendshipsWithUsersForUserFunc;
 }
 
 /**
@@ -42,141 +49,53 @@ const friendshipSchema = new mongoose.Schema({
 friendshipSchema.index({ senderId: 1 });
 friendshipSchema.index({ receiverId: 1 });
 
-friendshipSchema.methods.accept = function(
-  acceptedUserId: string,
-  cb?: (err: Error | null, friendship?: IFriendshipDocument) => void,
-): Promise<IFriendshipDocument> {
-  return new Promise((resolve, reject) => {
-    if (!this.receiverId.equals(acceptedUserId)) {
-      const error = new WrongUserAcceptFriendshipError();
-      if (cb) {
-        cb(error);
-      }
+const accept: TAcceptFunc = async function(this: IFriendshipDocument, acceptedUserId) {
+  if (!this.receiverId.equals(acceptedUserId)) {
+    throw new WrongUserAcceptFriendshipError();
+  }
 
-      reject(error);
+  if (this.accepted) {
+    return this;
+  }
 
-      return;
-    }
+  this.accepted = true;
+  await this.save();
 
-    if (this.accepted) {
-      if (cb) {
-        cb(null, this);
-      }
-
-      resolve(this);
-      return;
-    }
-
-    this.accepted = true;
-    const savePromise = this.save()
-      .then(() => {
-        if (cb) {
-          cb(null, this);
-        }
-
-        return this;
-      })
-      .catch((err: Error) => {
-        if (cb) {
-          cb(err);
-        }
-
-        throw err;
-      });
-
-    resolve(savePromise);
-  });
+  return this;
 };
+friendshipSchema.methods.accept = accept;
 
-friendshipSchema.methods.decline = function(
-  declinedUserId: string,
-  cb?: (err: Error | null, friendship?: IFriendshipDocument) => void,
-): Promise<IFriendshipDocument> {
-  return new Promise<IFriendshipDocument>((resolve, reject) => {
-    if (!this.accepted) {
-      if (!this.senderId.equals(declinedUserId)) {
-        const error = new WrongUserDeclineFriendshipError();
-        if (cb) {
-          cb(error);
-        }
-
-        reject(error);
-        return;
-      }
-
-      const removePromise = this.remove()
-        .then(() => {
-          if (cb) {
-            cb(null);
-          }
-        })
-        .catch((removeErr: Error) => {
-          if (cb) {
-            cb(removeErr);
-          }
-
-          throw removeErr;
-        });
-
-      resolve(removePromise);
-      return;
+const decline: TDeclineFunc = async function(this: IFriendshipDocument, declinedUserId) {
+  if (!this.accepted) {
+    if (!this.senderId.equals(declinedUserId)) {
+      throw new WrongUserDeclineFriendshipError();
     }
 
-    if (!this.senderId.equals(declinedUserId) && !this.receiverId.equals(declinedUserId)) {
-      const error = new WrongUserDeclineFriendshipError();
-      if (cb) {
-        cb(error);
-      }
+    await this.remove();
+    return null;
+  }
 
-      reject(error);
-      return;
-    }
+  if (!this.senderId.equals(declinedUserId) && !this.receiverId.equals(declinedUserId)) {
+    throw new WrongUserDeclineFriendshipError();
+  }
 
-    if (this.receiverId.equals(declinedUserId)) {
-      this.accepted = false;
-      const receiverSavePromise = this.save()
-        .then(() => {
-          if (cb) {
-            cb(null, this);
-          }
-
-          return this;
-        })
-        .catch((saveErr: Error) => {
-          if (cb) {
-            cb(saveErr);
-          }
-
-          throw saveErr;
-        });
-
-      resolve(receiverSavePromise);
-      return;
-    }
-
-    this.senderId = this.receiverId;
-    this.receiverId = declinedUserId;
+  if (this.receiverId.equals(declinedUserId)) {
     this.accepted = false;
+    await this.save();
 
-    const savePromise = this.save()
-      .then(() => {
-        if (cb) {
-          cb(null, this);
-        }
+    return this;
+  }
 
-        return this;
-      })
-      .catch((saveErr: Error) => {
-        if (cb) {
-          cb(saveErr);
-        }
+  this.senderId = this.receiverId;
+  this.receiverId = mongoose.Types.ObjectId(declinedUserId);
+  this.accepted = false;
 
-        throw saveErr;
-      });
+  await this.save();
 
-    resolve(savePromise);
-  });
+  return this;
 };
+
+friendshipSchema.methods.decline = decline;
 
 const findFriendshipsForUser: TFindFriendshipsForUserFunc = async function(this: IFriendshipModel, userId) {
   const [sentFriendships, receivedFriendships] = await Promise.all([
@@ -188,103 +107,43 @@ const findFriendshipsForUser: TFindFriendshipsForUserFunc = async function(this:
 };
 friendshipSchema.statics.findFriendshipsForUser = findFriendshipsForUser;
 
-/**
- * Получаем объект с заявками и друзьями пользователя
- * @param {ObjectId} userId - id пользователя, для которого получаем информацию
- * @param {Boolean} populate - требуется ли возвращать имя/фамилию друга
- * @param callback
- * Возвращаем объект с полями:
- *  - {Array} incoming - полученные заявки на дружбу
- *  - {Array} outcoming - отправленные заявки на дружбу
- *  - {Array} friends - подтверждённые заявки на дружбу
- */
-friendshipSchema.statics.getItemsForUser = function(
-  userId: TObjectId,
-  populate: boolean,
-  callback?: (err: Error | null, result?: any) => void,
-): Promise<any> {
-  return new Promise<any>((resolve) => {
-    const senderQuery = this.find({ senderId: userId });
+interface IFriendshipDocumentPopulated extends Omit<IFriendshipDocument, 'receiverId' | 'senderId'> {
+  receiverId: TObjectId | IUserDocument;
+  senderId: TObjectId | IUserDocument;
+}
+const findFriendshipsWithUsersForUser: TFindFriendshipsWithUsersForUserFunc =
+  async function(this: IFriendshipModel, userId) {
+    const queries = await Promise.all([
+      this.find({ senderId: userId }).populate('receiverId').lean().exec(),
+      this.find({ receiverId: userId }).populate('senderId').lean().exec(),
+    ]);
+    const receivedFriendshipsPopulated: IFriendshipDocumentPopulated[] = queries[0];
+    const sentFriendshipsPopulated: IFriendshipDocumentPopulated[] = queries[1];
 
-    if (populate) {
-      senderQuery.populate('senderId');
-      senderQuery.populate('receiverId');
-    }
+    const receivedFriendships: IFriendshipDocument[] = receivedFriendshipsPopulated.map(
+      (friendship) => ({
+        ...friendship,
+        receiverId: (friendship.receiverId as IUserDocument)._id,
+      } as IFriendshipDocument),
+    );
+    const sentFriendships: IFriendshipDocument[] = sentFriendshipsPopulated.map(
+      (friendship) => ({
+        ...friendship,
+        senderId: (friendship.senderId as IUserDocument)._id,
+      } as IFriendshipDocument),
+    );
 
-    let senderResultsClosured: any;
+    const receiveUsers: IUserDocument[] =
+      receivedFriendshipsPopulated.map((friendship) => friendship.receiverId as IUserDocument);
+    const sendUsers: IUserDocument[] =
+      sentFriendshipsPopulated.map((friendship) => friendship.senderId as IUserDocument);
 
-    const senderQueryPromise = senderQuery.exec()
-      .then((senderResults: any) => {
-        senderResultsClosured = senderResults;
-
-        const receiverQuery = this.find({ receiverId: userId });
-
-        if (populate) {
-          receiverQuery.populate('senderId');
-          receiverQuery.populate('receiverId');
-        }
-
-        return receiverQuery.exec();
-      })
-      .then((receiverResults: any) => {
-        const results = constructResultForUser(senderResultsClosured, receiverResults);
-
-        if (callback) {
-          callback(null, results);
-        }
-
-        return results;
-      })
-      .catch((err: Error) => {
-        if (callback) {
-          callback(err);
-        }
-
-        throw err;
-      });
-
-    resolve(senderQueryPromise);
-  });
-};
+    return {
+      friendships: sentFriendships.concat(receivedFriendships),
+      users: sendUsers.concat(receiveUsers),
+    };
+  };
+friendshipSchema.statics.findFriendshipsWithUsersForUser = findFriendshipsWithUsersForUser;
 
 const Friendship = mongoose.model<IFriendshipDocument, IFriendshipModel>('Friendship', friendshipSchema);
 export default Friendship;
-
-/**
- * Собираем итоговый объект для функции getItemsForUser
- * @param {Array} senderResults - заявки, в которых пользователь является отправителем
- * @param {Array} receiverResults - заявки, в которых пользователь является получателем
- */
-function constructResultForUser(senderResults: any, receiverResults: any) {
-  const incoming: any[] = [];
-  const outcoming: any[] = [];
-  const friends: any[] = [];
-  const result = { incoming, outcoming, friends };
-
-  for (const senderResult of senderResults) {
-    if (senderResult.accepted) {
-      result.friends.push(constructFriendshipResult(senderResult));
-    } else {
-      result.outcoming.push(constructFriendshipResult(senderResult));
-    }
-  }
-
-  for (const receiverResult of receiverResults) {
-    if (receiverResult.accepted) {
-      result.friends.push(constructFriendshipResult(receiverResult));
-    } else {
-      result.incoming.push(constructFriendshipResult(receiverResult));
-    }
-  }
-
-  return result;
-}
-
-function constructFriendshipResult(friendshipData: any) {
-  return {
-    accepted: friendshipData.accepted,
-    id: friendshipData._id,
-    receiver: UserPresenter.getData(friendshipData.receiverId),
-    sender: UserPresenter.getData(friendshipData.senderId),
-  };
-}
