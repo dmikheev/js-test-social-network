@@ -3,14 +3,16 @@ info:
   title: Friends API
   version: 1.0.0
 servers:
-- url: '/api'
+  - url: '/api'
 paths:
   /auth:
     post:
-      parameters:
-      - in: body
-        name: body
+      requestBody:
         required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserAuthInput"
       responses:
         '200':
           description: Successful login or register
@@ -28,11 +30,14 @@ paths:
   /user/get/{userId}:
     get:
       parameters:
-      - name: userId
-        in: path
-        type: string
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
       responses:
         '200':
+          description: OK
           content:
             application/json:
               schema:
@@ -45,14 +50,19 @@ paths:
   /users/find/{searchQuery}/{page}:
     get:
       parameters:
-      - name: searchQuery
-        in: path
-        type: string
-      - name: page
-        in: path
-        type: integer
+        - in: path
+          name: searchQuery
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: page
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
+          description: OK
           content:
             application/json:
               schema:
@@ -64,6 +74,7 @@ paths:
     get:
       responses:
         '200':
+          description: OK
           content:
             application/json:
               schema:
@@ -74,12 +85,14 @@ paths:
   /friendship/request/{userId}:
     post:
       parameters:
-      - name: userId
-        in: path
-        required: true
-        type: string
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
       responses:
         '200':
+          description: OK
           content:
             application/json:
               schema:
@@ -98,22 +111,18 @@ paths:
   /friendship/accept/{friendshipId}:
     post:
       parameters:
-      - name: friendshipId
-        in: path
-        required: true
-        type: string
+        - in: path
+          name: friendshipId
+          required: true
+          schema:
+            type: string
       responses:
         '200':
+          description: OK
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Friendship"
-        '400':
-          description: Invalid friendship ID
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
         '401':
           $ref: "#/components/responses/AuthRequired"
         '403':
@@ -123,29 +132,25 @@ paths:
 
   /friendship/decline/{friendshipId}:
     post:
-    parameters:
-    - name: friendshipId
-      in: path
-      required: true
-      type: string
-    responses:
-      '200':
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/FriendshipDeclineResponse"
-      '400':
-        description: Invalid friendship ID
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Error"
-      '401':
-        $ref: "#/components/responses/AuthRequired"
-      '403':
-        $ref: "#/components/responses/Forbidden"
-      '404':
-        $ref: "#/components/responses/NotFound"
+      parameters:
+        - in: path
+          name: friendshipId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FriendshipDeclineResponse"
+        '401':
+          $ref: "#/components/responses/AuthRequired"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '404':
+          $ref: "#/components/responses/NotFound"
 
 components:
   responses:
@@ -162,7 +167,7 @@ components:
           schema:
             $ref: "#/components/schemas/Error"
     NotFound:
-      description: Auth required
+      description: Not found
       content:
         application/json:
           schema:
@@ -172,10 +177,10 @@ components:
     User:
       type: object
       required:
-      - id
-      - lastname
-      - name
-      - regDate
+        - id
+        - lastname
+        - name
+        - regDate
       properties:
         id:
           type: string
@@ -184,14 +189,14 @@ components:
         name:
           type: string
         regDate:
-          types: string
+          type: string
 
     Friendship:
       type: object
       required:
-      - isAccepted
-      - receiverId
-      - senderId
+        - isAccepted
+        - receiverId
+        - senderId
       properties:
         isAccepted:
           type: boolean
@@ -203,8 +208,8 @@ components:
     UserAuthInput:
       type: object
       required:
-      - login
-      - pass
+        - login
+        - pass
       properties:
         lastname:
           type: string
@@ -218,8 +223,8 @@ components:
     UserAuthResponse:
       type: object
       required:
-      - operation
-      - user
+        - operation
+        - user
       properties:
         operation:
           type: string
@@ -229,10 +234,10 @@ components:
     UsersFindResponse:
       type: object
       required:
-      - currentUserFriendships
-      - foundUsers
-      - itemsPerPage
-      - totalItemsCount
+        - currentUserFriendships
+        - foundUsers
+        - itemsPerPage
+        - totalItemsCount
       properties:
         currentUserFriendships:
           type: array
@@ -250,8 +255,8 @@ components:
     FriendshipsGetAllResponse:
       type: object
       required:
-      - friendships
-      - users
+        - friendships
+        - users
       properties:
         friendships:
           type: array
@@ -265,7 +270,7 @@ components:
     FriendshipDeclineResponse:
       type: object
       required:
-      - isDeleted
+        - isDeleted
       properties:
         isDeleted:
           type: boolean
@@ -275,12 +280,12 @@ components:
     Error:
       type: object
       required:
-      - error
+        - error
       properties:
         error:
           type: object
           required:
-          - message
+            - message
           properties:
             message:
               type: string
