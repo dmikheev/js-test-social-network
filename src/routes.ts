@@ -25,10 +25,14 @@ export function setup(app: Express) {
 }
 
 export function setupHistoryApiFallback(app: Express) {
-  app.get('*', returnIndex);
+  app.get('*', returnIndexForNonApiRoute);
 }
 
-const returnIndex: RequestHandler = (req, res, next) => {
+const returnIndexForNonApiRoute: RequestHandler = (req, res, next) => {
+  if (req.path.indexOf('/api/') === 0) {
+    return next();
+  }
+
   try {
     return res.sendFile(path.resolve(CLIENT_PATH, 'index.html'));
   } catch (err) {
