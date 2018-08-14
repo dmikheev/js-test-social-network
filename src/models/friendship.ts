@@ -1,8 +1,7 @@
 import mongoose, { Document, Model } from 'mongoose';
 import WrongUserAcceptFriendshipError from '../errors/wrongUserAcceptFriendshipError';
 import WrongUserDeclineFriendshipError from '../errors/wrongUserDeclineFriendshipError';
-import { Omit } from '../utils/ts';
-import { IUserDocument } from './user';
+import User, { IUserDocument } from './user';
 
 /**
  * Модель дружбы для mongoose
@@ -100,10 +99,6 @@ const findFriendshipsForUser: TFindFriendshipsForUserFunc = async function(this:
 };
 friendshipSchema.statics.findFriendshipsForUser = findFriendshipsForUser;
 
-interface IFriendshipDocumentPopulated extends Omit<IFriendshipDocument, 'receiverId' | 'senderId'> {
-  receiverId: TObjectId | IUserDocument;
-  senderId: TObjectId | IUserDocument;
-}
 interface IFindFriendshipsWithUsersResult {
   friendships: IFriendshipDocument[];
   users: IUserDocument[];
@@ -111,34 +106,18 @@ interface IFindFriendshipsWithUsersResult {
 type TFindFriendshipsWithUsersForUserFunc = (userId: TObjectId) => Promise<IFindFriendshipsWithUsersResult>;
 const findFriendshipsWithUsersForUser: TFindFriendshipsWithUsersForUserFunc =
   async function(this: IFriendshipModel, userId) {
-    const queries = await Promise.all([
-      this.find({ senderId: userId }).populate('receiverId').lean().exec(),
-      this.find({ receiverId: userId }).populate('senderId').lean().exec(),
+    const [sentFriendships, receivedFriendships] = await Promise.all([
+      this.find({ senderId: userId }).exec(),
+      this.find({ receiverId: userId }).exec(),
     ]);
-    const receivedFriendshipsPopulated: IFriendshipDocumentPopulated[] = queries[0];
-    const sentFriendshipsPopulated: IFriendshipDocumentPopulated[] = queries[1];
-
-    const receivedFriendships: IFriendshipDocument[] = receivedFriendshipsPopulated.map(
-      (friendship) => ({
-        ...friendship,
-        receiverId: (friendship.receiverId as IUserDocument)._id,
-      } as IFriendshipDocument),
+    const userIds = sentFriendships.map((friendship) => friendship.receiverId).concat(
+      receivedFriendships.map((friendship) => friendship.senderId),
     );
-    const sentFriendships: IFriendshipDocument[] = sentFriendshipsPopulated.map(
-      (friendship) => ({
-        ...friendship,
-        senderId: (friendship.senderId as IUserDocument)._id,
-      } as IFriendshipDocument),
-    );
-
-    const receiveUsers: IUserDocument[] =
-      receivedFriendshipsPopulated.map((friendship) => friendship.receiverId as IUserDocument);
-    const sendUsers: IUserDocument[] =
-      sentFriendshipsPopulated.map((friendship) => friendship.senderId as IUserDocument);
+    const users = await User.getByIds(userIds);
 
     return {
+      users,
       friendships: sentFriendships.concat(receivedFriendships),
-      users: sendUsers.concat(receiveUsers),
     };
   };
 friendshipSchema.statics.findFriendshipsWithUsersForUser = findFriendshipsWithUsersForUser;

@@ -22,6 +22,7 @@ export interface IUserDocument extends Document {
 }
 
 interface IUserModel extends Model<IUserDocument> {
+  getByIds: TGetByIdsFunc;
   searchByText: TSearchByTextFunc;
 }
 
@@ -62,6 +63,13 @@ userSchema.pre<IUserDocument>('save', async function(next) {
 userSchema.methods.comparePass = function(enteredPass: string): Promise<boolean> {
   return bcrypt.compare(enteredPass, this.pass);
 };
+
+type TId = number | string | mongoose.Types.ObjectId;
+type TGetByIdsFunc = (ids: TId[]) => Promise<IUserDocument[]>;
+const getByIds: TGetByIdsFunc = async function(this: IUserModel, ids) {
+  return this.find({ _id: { $in: ids } });
+};
+userSchema.statics.getByIds = getByIds;
 
 interface ISearchByTextResult {
   totalCount: number;
