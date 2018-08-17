@@ -46,7 +46,7 @@ export default class LoginPage extends React.PureComponent<ILoginPageProps> {
                 />
               </div>
               <button id="button" className="rectangular green" onClick={props.onFormSubmit}>
-                <i className="fa fa-sign-in" />
+                <i className="fa fa-sign-in-alt" />
                 <span>Log In</span>
               </button>
             </div>
