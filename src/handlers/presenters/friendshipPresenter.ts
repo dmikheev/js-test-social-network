@@ -1,8 +1,8 @@
 import { IFriendshipDocument } from '../../models/friendship';
 
 interface IFriendshipClientData {
-  accepted: boolean;
   id: string;
+  isAccepted: boolean;
   receiverId: string;
   senderId: string;
 }
@@ -10,8 +10,8 @@ interface IFriendshipClientData {
 const FriendshipPresenter = {
   getData(friendship: IFriendshipDocument): IFriendshipClientData {
     return {
-      accepted: friendship.accepted,
       id: friendship._id,
+      isAccepted: friendship.accepted,
       receiverId: friendship.receiverId.toString(),
       senderId: friendship.senderId.toString(),
     };

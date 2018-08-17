@@ -1,11 +1,14 @@
+import 'babel-polyfill';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 
 import './css/global.css';
+import './ui/app.css';
 
-import Root from './Root';
+import HotReloadRoot from './HotReloadRoot';
 
 ReactDOM.render(
-  <Root/>,
+  <HotReloadRoot/>,
   document.getElementById('app'),
 );

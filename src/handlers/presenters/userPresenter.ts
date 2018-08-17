@@ -23,7 +23,7 @@ const UserPresenter = {
       resultData.lastname = user.lastname;
     }
     if (user.regDate) {
-      resultData.regDate = new Date(user.regDate).toLocaleDateString();
+      resultData.regDate = user.regDate;
     }
 
     return Object.assign(resultData, additionalData);
